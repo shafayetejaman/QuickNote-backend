@@ -9,7 +9,7 @@ interface UserInterface {
     password: string
     status: "ONLINE" | "OFFLINE"
     lastOnline: Date
-    imageUrl: string
+    profileImageUrl: string
     refreshToken: string
 }
 
@@ -20,9 +20,9 @@ const userSchema = new mongoose.Schema<UserInterface>({
         index: true,
         required: true,
         trim: true,
-        match: /^([a-z]+\d*)+$/,
-        minlength: 5,
-        maxlength: 20,
+        match: /^([a-zA-Z._-]+\d*)+$/,
+        minlength: 2,
+        maxlength: 50,
     },
     email: {
         type: String,
@@ -51,7 +51,7 @@ const userSchema = new mongoose.Schema<UserInterface>({
         type: Date,
         default: Date.now,
     },
-    imageUrl: {
+    profileImageUrl: {
         type: String,
     },
 })

@@ -2,6 +2,7 @@ import cookieParser from "cookie-parser"
 import cors from "cors"
 import express from "express"
 import constants from "./constants"
+import errorHandeler from "./middlewares/errorHendeler.middleware"
 import formatter from "./middlewares/logger.middleware"
 
 const app = express()
@@ -19,5 +20,8 @@ import userRouter from "./routes/user.routers"
 
 // routes
 app.use("/api/v1/users", userRouter)
+
+// error middleware for sending error respose to user
+app.use(errorHandeler())
 
 export default app

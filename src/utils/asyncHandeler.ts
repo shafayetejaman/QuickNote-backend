@@ -10,7 +10,7 @@ function asyncHandler(func: AsyncHandler) {
     return function (req: Request, res: Response, next: NextFunction) {
         Promise.resolve(func(req, res, next)).catch((error) => {
             console.error("Error from asyncHandler: ", error)
-            next()
+            next(error)
         })
     }
 }

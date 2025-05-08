@@ -1,6 +1,6 @@
 class ApiError extends Error {
     constructor(
-        public statusCode: number,
+        public statusCode = 500,
         public message = "Some Thing Went Wrong!",
         public data: null | object = null,
         public success = false,

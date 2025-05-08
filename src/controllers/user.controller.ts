@@ -29,12 +29,7 @@ const registerUser = asyncHandler(async (req, res) => {
     if (missingFields.length > 0) {
         statusCode = 400
         if (profileImagePath) fs.unlinkSync(profileImagePath)
-
-        return res.status(statusCode).json(
-            new ApiError(statusCode, "Missing some fields", {
-                missingFields,
-            })
-        )
+        throw new ApiError(statusCode, "Missing some fields", { missingFields })
     }
 
     // chaking if username and email already exits
@@ -45,31 +40,26 @@ const registerUser = asyncHandler(async (req, res) => {
     ) {
         statusCode = 409
         if (profileImagePath) fs.unlinkSync(profileImagePath)
-        return res
-            .status(statusCode)
-            .json(new ApiError(statusCode, "Username or Emial already taken!"))
+        throw new ApiError(statusCode, "Username or Emial already taken!")
     }
-
     // uploading user img to cloudinary
+    console.log("uploading to cloudinary....")
     let cloudinaryRespose: UploadApiResponse | null = null
     if (profileImagePath) {
         cloudinaryRespose = await imagefileUploder(profileImagePath)
     }
+    console.log("upload completed")
 
     // add extra fields
-    user.imageUrl = cloudinaryRespose?.url || ""
-    user.refreshToken = ""
+    if (cloudinaryRespose?.url) user.profileImageUrl = cloudinaryRespose.url
 
     // validating the given data
     try {
         await user.save() // Trying to create the user on the database
-        if (profileImagePath) fs.unlinkSync(profileImagePath)
     } catch (error) {
         console.error(error)
         statusCode = 400
-        return res
-            .status(statusCode)
-            .json(new ApiError(statusCode, "Invalid Data!"))
+        throw new ApiError(statusCode, "Invalid Data!")
     }
 
     // sending successfull response
