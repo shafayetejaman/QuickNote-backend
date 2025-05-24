@@ -1,17 +1,20 @@
-import { NextFunction, Request, Response } from "express"
+import { NextFunction, RequestHandler, Response } from "express"
+import { CustomRequest } from "../customRequest"
 
-type AsyncHandler = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => Promise<unknown>
-
-function asyncHandler(func: AsyncHandler) {
-    return function (req: Request, res: Response, next: NextFunction) {
-        Promise.resolve(func(req, res, next)).catch((error) => {
-            console.error("Error from asyncHandler: ", error)
-            next(error)
-        })
+function asyncHandler(
+    func: (
+        req: CustomRequest,
+        res: Response,
+        next: NextFunction
+    ) => Promise<any>
+): RequestHandler {
+    return (req, res, next) => {
+        Promise.resolve(func(req as CustomRequest, res, next)).catch(
+            (error) => {
+                console.error("Error from asyncHandler: ", error)
+                next(error)
+            }
+        )
     }
 }
 

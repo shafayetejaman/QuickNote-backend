@@ -12,8 +12,9 @@ async function imagefileUploder(filePath: string) {
     if (!filePath) return null
 
     try {
+        console.log("uploding to cloudinary..............")
         const response = await cloudinary.uploader.upload(filePath, {
-            resource_type: "image",
+            resource_type: "auto",
             transformation: {
                 quality: "auto:low",
             },

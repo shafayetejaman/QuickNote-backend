@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import createClient from "node-cache"
 
 async function dbConnect() {
     const dbConnection = await mongoose.connect(
@@ -7,4 +8,6 @@ async function dbConnect() {
     console.log("DB connect to ", dbConnection.connection.host)
 }
 
-export default dbConnect
+const cache = new createClient()
+
+export { cache, dbConnect }
