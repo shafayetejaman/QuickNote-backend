@@ -7,7 +7,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     } else {
         res.status(500).json(new ApiError())
     }
-    next(err)
+    next()
 }
 
 export default errorHandler

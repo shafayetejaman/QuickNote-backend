@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary"
 import fs from "fs"
+import ApiError from "./apiError"
 // Configuration
 
 cloudinary.config({
@@ -21,13 +22,17 @@ async function imagefileUploder(filePath: string) {
         })
         console.log("img url", response.url)
 
-        fs.unlinkSync(filePath)
+        fs.unlink(filePath, (error) => {
+            console.error(error)
+        })
         return response
     } catch (error) {
         console.error("error fileUploder :", error)
+        fs.unlink(filePath, (error) => {
+            console.error(error)
+        })
+        throw new ApiError(500, "Image Upload Field!")
     }
-    fs.unlinkSync(filePath)
-    return null
 }
 
 export default imagefileUploder

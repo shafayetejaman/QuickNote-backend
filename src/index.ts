@@ -12,7 +12,8 @@ dbConnect()
             const addressInfo = server.address()
             if (typeof addressInfo === "object" && addressInfo !== null) {
                 console.log(
-                    `Server is running at http://${addressInfo.address}:${addressInfo.port}`
+                    "Server is running at http://" +
+                        `${addressInfo.address}:${addressInfo.port}`
                 )
             }
         })

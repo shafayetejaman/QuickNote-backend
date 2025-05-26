@@ -1,3 +1,4 @@
+import compression from "compression"
 import cookieParser from "cookie-parser"
 import cors from "cors"
 import express from "express"
@@ -8,6 +9,7 @@ import formatter from "./middlewares/logger.middleware"
 const app = express()
 
 // middle wares
+app.use(compression({ threshold: 0 }))
 app.use(express.json({ limit: constants.LIMIT }))
 app.use(express.static("public"))
 app.use(express.urlencoded({ extended: true, limit: constants.LIMIT }))

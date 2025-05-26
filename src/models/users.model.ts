@@ -1,4 +1,6 @@
 import bycript from "bcrypt"
+import crypto from "crypto"
+import dayjs from "dayjs"
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose"
 
@@ -8,12 +10,17 @@ interface UserInterface {
     email: string
     password: string
     lastOnline: Date
-    profileImageUrl: string
-    refreshToken: string
-    isAdmin: boolean
+    profileImageUrl?: string
+    refreshToken?: string
+    role: "admin" | "inactive" | "deactivated" | "active"
+    activationToken?: { token: string; expiresAt: Date }
     isPasswordMatch: (password: string) => Promise<boolean>
     generateAccessToken: () => Promise<string>
     generateRefreshToken: () => Promise<string>
+    generateActivationToken: () => Promise<{
+        token: string
+        expiresAt: Date
+    }>
 }
 
 const userSchema = new mongoose.Schema<UserInterface>({
@@ -40,10 +47,12 @@ const userSchema = new mongoose.Schema<UserInterface>({
     password: {
         type: String,
         required: true,
+        minlength: 8,
     },
-    isAdmin: {
-        type: Boolean,
-        default: false,
+    role: {
+        type: String,
+        enum: ["admin", "inactive", "deactivated", "active"],
+        default: "inactive",
     },
     refreshToken: {
         type: String,
@@ -54,6 +63,9 @@ const userSchema = new mongoose.Schema<UserInterface>({
     },
     profileImageUrl: {
         type: String,
+    },
+    activationToken: {
+        type: Object,
     },
 })
 
@@ -71,7 +83,6 @@ userSchema.methods.isPasswordMatch = async function (password: string) {
     return await bycript.compare(password, this.password)
 }
 userSchema.methods.generateAccessToken = async function () {
-    const expiry = (process.env.JWT_ACCESS_TOKEN_EXPIRY as "") || "1d"
     return jwt.sign(
         {
             _id: this._id,
@@ -79,21 +90,25 @@ userSchema.methods.generateAccessToken = async function () {
         },
         process.env.JWT_ACCESS_TOKEN as string,
         {
-            expiresIn: expiry,
+            expiresIn: (process.env.JWT_ACCESS_TOKEN_EXPIRY as "") || "1s",
         }
     )
 }
 userSchema.methods.generateRefreshToken = async function () {
-    const expiry = (process.env.JWT_REFRESH_TOKEN_EXPIRY as "") || "1d"
     return jwt.sign(
         {
             _id: this._id,
         },
         process.env.JWT_REFRESH_TOKEN as string,
         {
-            expiresIn: expiry,
+            expiresIn: (process.env.JWT_REFRESH_TOKEN_EXPIRY as "") || "1s",
         }
     )
+}
+userSchema.methods.generateActivationToken = async function () {
+    const token = crypto.randomBytes(32)
+    const expiresAt = dayjs().add(1, "day").toDate()
+    return { token, expiresAt }
 }
 
 export const User = mongoose.model<UserInterface>("User", userSchema)

@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken"
 import {
     cookieOptions,
     cookieOptionsWithPath,
-    extractUserData,
 } from "../controllers/user.controller"
 import { cache } from "../db/db"
 import { User } from "../models/users.model"
@@ -32,7 +31,7 @@ export default asyncHandler(async (req, res, next) => {
             .json(new ApiRespose(statusCode, "Access Token Expired!"))
     }
 
-    req.user = cache.get(payload?.username || "")
+    if (payload?.username) req.user = cache.get(payload?.username)
 
     if (!payload || (req.user && req.user?._id.toString() != payload?._id)) {
         throw new ApiError(statusCode, "Access Token Invalid!")
@@ -41,7 +40,7 @@ export default asyncHandler(async (req, res, next) => {
     if (!req.user) {
         const user = await User.findById(payload._id)
         if (!user) throw new ApiError(statusCode, "Access Token Invalid!")
-        req.user = extractUserData(user)
+        req.user = user
         cache.set(user.username, req.user)
     }
 
