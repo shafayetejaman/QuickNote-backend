@@ -74,7 +74,7 @@ userSchema.pre("save", async function (next: any) {
 
   this.password = await bycript.hash(
     this.password,
-    Number(process.env.BYCRIPT_ROUND)
+    Number(process.env.BYCRYPT_ROUND)
   )
   next()
 })
