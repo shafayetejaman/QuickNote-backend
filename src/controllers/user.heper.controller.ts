@@ -3,6 +3,7 @@ import invalidDomian from "disposable-email-domains"
 import validator from "validator"
 import { User } from "../models/users.model"
 import ApiError from "../utils/apiError"
+import EmailService from "../utils/sendMail"
 
 const cookieOptions = {
     // Use security feature only in production
@@ -62,6 +63,8 @@ async function sendEmailWithActivationToken(user: InstanceType<typeof User>) {
         .digest("base64url")
 
     user.activationToken = { token: hasedToken, expiresAt }
+    const info = await EmailService.send(user)
+    console.log("Emailservice Respose: ", info)
 }
 
 function extractUserData(user: InstanceType<typeof User>) {
