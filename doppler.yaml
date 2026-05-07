@@ -1,0 +1,3 @@
+setup:
+    - project: quick-note
+      config: dev_personal
