@@ -63,12 +63,11 @@ const registerUser = asyncHandler(async (req, res) => {
     // add extra fields
     if (cloudinaryRespose?.url) user.profileImageUrl = cloudinaryRespose.url
 
-    // genrerate token and store it to the DB and send to user via email
-    await sendEmailWithActivationToken(user)
-
     // validating the given data
     try {
         await user.save() // Trying to create the user on the database
+        // genrerate token and store it to the DB and send to user via email
+        await sendEmailWithActivationToken(user)
     } catch (error) {
         console.error(error)
         if (error instanceof mongo.MongoServerError && error.code === 11000) {
@@ -252,7 +251,7 @@ const activateUser = asyncHandler(async (req, res) => {
     let statusCode = 401
     let user: InstanceType<typeof User> | null = null
 
-    if (!(req.query.user && req.query.token)) {
+    if (!(req.query.userId && req.query.token)) {
         throw new ApiError(statusCode, "Activation token and user ID required")
     }
 

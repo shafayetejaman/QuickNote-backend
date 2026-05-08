@@ -63,7 +63,14 @@ async function sendEmailWithActivationToken(user: InstanceType<typeof User>) {
         .digest("base64url")
 
     user.activationToken = { token: hasedToken, expiresAt }
-    const info = await EmailService.send(user)
+
+    try {
+        await user.save()
+    } catch (error) {
+        throw new ApiError(500, "Unable to generate activation token")
+    }
+
+    const info = await EmailService.send(user, token)
     console.log("Emailservice Respose: ", info)
 }
 

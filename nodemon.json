@@ -2,5 +2,5 @@
     "watch": ["src"],
     "ext": "ts",
     "ignore": ["node_modules"],
-    "exec": "tsc && node ./dist/index.js"
+    "exec": "tsc && mkdir -p dist/templates && cp src/templates/* dist/templates/ && node ./dist/index.js"
 }

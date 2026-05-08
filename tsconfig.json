@@ -18,6 +18,10 @@
         "alwaysStrict": true,
         "useUnknownInCatchVariables": true
     },
-    "include": ["src/**/*.ts", "src/middlewares/log.middleware.js"],
+    "include": [
+        "src/**/*.ts",
+        "src/middlewares/log.middleware.js",
+        "src/templates/activationEmail.html"
+    ],
     "exclude": ["node_modules"]
 }

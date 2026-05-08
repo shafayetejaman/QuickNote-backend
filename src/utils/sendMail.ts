@@ -31,10 +31,10 @@ class EmailService {
         return file
     }
 
-    async send(user: InstanceType<typeof User>) {
+    async send(user: InstanceType<typeof User>, token: string) {
         const data = {
             username: user.username,
-            token: `${process.env.LOCAL_BASE_BACKEND_URL}/api/v1/users/activate/?userId=${user.id}&token=${user.activationToken?.token}`,
+            token: `${process.env.LOCAL_BASE_BACKEND_URL}/api/v1/users/activate/?userId=${user.id}&token=${token}`,
         }
         const html = this.getTemplate(data)
 

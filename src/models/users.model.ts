@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema<UserInterface>({
     },
     email: {
         type: String,
-        unique: true,
+        unique: false, // set true on prouction
         trim: true,
         required: true,
     },
@@ -106,8 +106,13 @@ userSchema.methods.generateRefreshToken = async function () {
 }
 userSchema.methods.generateActivationToken = async function () {
     const token = crypto.randomBytes(32)
+    const hasedToken = crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("base64url")
+
     const expiresAt = dayjs().add(1, "day").toDate()
-    return { token, expiresAt }
+    return { token: hasedToken, expiresAt }
 }
 
 export const User = mongoose.model<UserInterface>("User", userSchema)
