@@ -46,9 +46,9 @@ const registerUser = asyncHandler(async (req, res) => {
     if (!isStrongPassword) {
         throw new ApiError(
             403,
-            `Password must contain at least 8 characters,` +
-                `including 1 uppercase letter,` +
-                `1 lowercase letter, and 1 number`
+            `Password must contain at least 8 characters, ` +
+                `including 1 letter, ` +
+                `and 1 number`
         )
     }
 
