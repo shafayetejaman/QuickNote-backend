@@ -11,7 +11,21 @@ import asyncHandler from "../utils/asyncHandeler"
 import { Payload } from "../customeInterface/customPlayload"
 
 function validateJwtField(payload: any): payload is Payload {
-    return true
+    if (payload === null || typeof payload !== "object") return false
+
+    const keys = Object.keys(payload)
+    const pKeys = ["_id", "username", "timeStamp", "role"]
+
+    for (const key in keys) {
+        if (!pKeys.includes(key)) return false
+    }
+
+    return (
+        typeof payload._id === "string" &&
+        typeof payload.username === "string" &&
+        typeof payload.timeStamp === "number" &&
+        typeof payload.role === "string"
+    )
 }
 
 export default asyncHandler(async (req, res, next) => {

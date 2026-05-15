@@ -1,7 +1,7 @@
 export interface Payload {
     _id: string
     username: string
-    timeStamp: Date
+    timeStamp: number
     role: string
     profileImageUrl: string
 }
