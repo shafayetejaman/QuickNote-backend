@@ -9,7 +9,6 @@ interface UserInterface {
     fullName: string
     email: string
     password: string
-    lastOnline: Date
     profileImageUrl?: string
     refreshToken?: string
     role: "admin" | "inactive" | "deactivated" | "active"
@@ -57,10 +56,6 @@ const userSchema = new mongoose.Schema<UserInterface>({
     refreshToken: {
         type: String,
     },
-    lastOnline: {
-        type: Date,
-        default: Date.now,
-    },
     profileImageUrl: {
         type: String,
     },
@@ -86,6 +81,10 @@ userSchema.methods.generateAccessToken = async function () {
         {
             _id: this._id,
             username: this.username,
+            timeStamp: Date.now(),
+            lastOnline: Date.now(),
+            role: this.role,
+            profileImageUrl: this.profileImageUrl,
         },
         process.env.JWT_ACCESS_TOKEN as string,
         {

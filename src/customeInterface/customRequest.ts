@@ -1,8 +1,8 @@
 import { Request } from "express"
-import { User } from "./models/users.model"
+import { Payload } from "./customPlayload"
 
 export interface CustomRequest extends Request {
-    user?: InstanceType<typeof User>
+    user?: Payload
 
     files?: {
         profileImage?: Express.Multer.File[]

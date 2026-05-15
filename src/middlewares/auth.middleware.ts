@@ -8,6 +8,11 @@ import { User } from "../models/users.model"
 import ApiError from "../utils/apiError"
 import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
+import { Payload } from "../customeInterface/customPlayload"
+
+function validateJwtField(payload: any): payload is Payload {
+    return true
+}
 
 export default asyncHandler(async (req, res, next) => {
     let statusCode = 401
@@ -22,27 +27,17 @@ export default asyncHandler(async (req, res, next) => {
         payload = jwt.verify(
             accessToken,
             process.env.JWT_ACCESS_TOKEN as string
-        ) as { username?: string; _id?: string }
+        )
     } catch (error) {
         console.error(error)
-        res.clearCookie("accessToken", cookieOptions)
+        return res
+            .clearCookie("accessToken", cookieOptions)
             .clearCookie("refreshToken", cookieOptionsWithPath)
             .status(statusCode)
             .json(new ApiRespose(statusCode, "Access Token Expired!"))
     }
-
-    if (payload?.username) req.user = cache.get(payload?.username)
-
-    if (!payload || (req.user && req.user?._id.toString() != payload?._id)) {
-        throw new ApiError(statusCode, "Access Token Invalid!")
-    }
-
-    if (!req.user) {
-        const user = await User.findById(payload._id)
-        if (!user) throw new ApiError(statusCode, "Access Token Invalid!")
-        req.user = user
-        cache.set(user.username, req.user)
-    }
+    // TODO: convert user to playload
+    if (validateJwtField(payload)) req.user = payload
 
     next()
 })

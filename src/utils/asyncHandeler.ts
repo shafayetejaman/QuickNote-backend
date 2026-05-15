@@ -1,5 +1,5 @@
 import { NextFunction, RequestHandler, Response } from "express"
-import { CustomRequest } from "../customRequest"
+import { CustomRequest } from "../customeInterface/customRequest"
 
 function asyncHandler(
     func: (
