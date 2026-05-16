@@ -13,6 +13,10 @@ import { Payload } from "../customeInterface/customPlayload"
 function validateJwtField(payload: any): payload is Payload {
     if (payload === null || typeof payload !== "object") return false
 
+    if (payload.profileImageUrl) {
+        if (typeof payload.profileImageUrl !== "string") return false
+    }
+
     const keys = Object.keys(payload)
     const pKeys = ["_id", "username", "timeStamp", "role"]
 
@@ -48,9 +52,8 @@ export default asyncHandler(async (req, res, next) => {
             .clearCookie("accessToken", cookieOptions)
             .clearCookie("refreshToken", cookieOptionsWithPath)
             .status(statusCode)
-            .json(new ApiRespose(statusCode, "Access Token Expired!"))
+            .json(new ApiRespose(statusCode, "Access Token Invalid!"))
     }
-    // TODO: convert user to playload
     if (validateJwtField(payload)) req.user = payload
 
     next()

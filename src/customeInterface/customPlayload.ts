@@ -3,5 +3,5 @@ export interface Payload {
     username: string
     timeStamp: number
     role: string
-    profileImageUrl: string
+    profileImageUrl?: string
 }

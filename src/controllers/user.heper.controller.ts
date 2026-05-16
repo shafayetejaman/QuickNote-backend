@@ -81,9 +81,23 @@ function extractUserData(user: InstanceType<typeof User>) {
     return userData
 }
 
+async function getUser(
+    userId: string
+): Promise<InstanceType<typeof User> | null> {
+    let user = null
+    try {
+        const user = await User.findById(userId)
+    } catch (error) {
+        throw new ApiError(500, "Unable to get user data")
+    }
+
+    return user
+}
+
 export {
     cookieOptions,
     cookieOptionsWithPath,
+    getUser,
     extractUserData,
     sendEmailWithActivationToken,
     setAccessAndRefereshToken,

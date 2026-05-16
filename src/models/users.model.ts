@@ -88,7 +88,7 @@ userSchema.methods.generateAccessToken = async function () {
         },
         process.env.JWT_ACCESS_TOKEN as string,
         {
-            expiresIn: (process.env.JWT_ACCESS_TOKEN_EXPIRY as "") || "1s",
+            expiresIn: (process.env.JWT_ACCESS_TOKEN_EXPIRY as "") || "1m",
         }
     )
 }
@@ -99,7 +99,7 @@ userSchema.methods.generateRefreshToken = async function () {
         },
         process.env.JWT_REFRESH_TOKEN as string,
         {
-            expiresIn: (process.env.JWT_REFRESH_TOKEN_EXPIRY as "") || "1s",
+            expiresIn: (process.env.JWT_REFRESH_TOKEN_EXPIRY as "") || "1m",
         }
     )
 }
