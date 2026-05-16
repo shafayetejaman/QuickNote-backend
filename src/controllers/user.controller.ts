@@ -13,21 +13,22 @@ import {
     cookieOptions,
     cookieOptionsWithPath,
     extractUserData,
+    getUser,
     sendEmailWithActivationToken,
     setAccessAndRefereshToken,
     validateUserData,
 } from "./user.heper.controller"
+import { Payload } from "../customeInterface/customPlayload"
 
 const registerUser = asyncHandler(async (req, res) => {
     const data = req.body
 
-    const user = new User(data)
-    const profileImagePath = req.files?.profileImage?.[0]?.path || null
-
     // chacking for missing fields
     const missingFields = ["username", "fullName", "email", "password"].filter(
-        (field) => !data[field]
+        (field) => !data[field] || typeof field !== "string"
     )
+
+    const profileImagePath = req.files?.profileImage?.[0]?.path || null
 
     if (missingFields.length > 0) {
         if (profileImagePath) {
@@ -35,7 +36,7 @@ const registerUser = asyncHandler(async (req, res) => {
                 console.log(error)
             })
         }
-        throw new ApiError(400, "Missing some fields", { missingFields })
+        throw new ApiError(400, "Missing or invalid fields", { missingFields })
     }
 
     const { isStrongPassword, isValidEmail } = validateUserData(
@@ -53,6 +54,7 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     if (!isValidEmail) throw new ApiError(403, "Invalid Email!")
+    const user = new User(data)
 
     let cloudinaryRespose: UploadApiResponse | null = null
     if (profileImagePath) {
@@ -85,7 +87,11 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body
 
-    const user = await User.findOne({ username })
+    if (typeof username !== "string" || typeof password !== "string") {
+        throw new ApiError(404, "username or password is invalid!")
+    }
+
+    const user = await getUser(username)
 
     if (!user || !(await user?.isPasswordMatch(password))) {
         throw new ApiError(404, "username or password is incorrect!")
@@ -117,11 +123,14 @@ const loginUser = asyncHandler(async (req, res) => {
 const logoutUser = asyncHandler(async (req, res) => {
     if (!req.user) throw new ApiError()
 
+    const user = await getUser(req.user.username)
+    if (!user) throw new ApiError(500, "Unable to find user")
+
     cache.del(req.user.username)
-    req.user.refreshToken = undefined
+    user.refreshToken = undefined
 
     try {
-        await req.user.save()
+        await user.save()
     } catch (error) {
         console.error(error)
         throw new ApiError(500, "Unable to logout user!")
@@ -139,7 +148,8 @@ const getRefreshToken = asyncHandler(async (req, res) => {
         req.cookies.refreshToken ||
         req.header("Authorization")?.replace("Bearer ", "")
 
-    const redirect = () => res.redirect(process.env.FRONTEND_ADDRESS + "/login")
+    const redirect = () =>
+        res.redirect(process.env.LOCAL_FRONTEND_URL + "/login")
 
     if (!incommingRefreshToken) return redirect()
 
@@ -148,7 +158,7 @@ const getRefreshToken = asyncHandler(async (req, res) => {
         payload = jwt.verify(
             incommingRefreshToken,
             process.env.JWT_REFRESH_TOKEN as string
-        ) as { _id?: string }
+        ) as Payload
     } catch (error) {
         console.error(error)
         return redirect()
@@ -156,8 +166,7 @@ const getRefreshToken = asyncHandler(async (req, res) => {
 
     if (!payload) return redirect()
 
-    const user = await User.findById(payload?._id)
-
+    const user = await getUser(payload.username)
     if (!user) return redirect()
 
     const { accessToken, refreshToken } = await setAccessAndRefereshToken(user)
@@ -179,6 +188,9 @@ const getRefreshToken = asyncHandler(async (req, res) => {
 const updateUser = asyncHandler(async (req, res) => {
     if (!req.user) throw new ApiError()
 
+    const user = await getUser(req.user.username)
+    if (!user) throw new ApiError(500, "Unable to find user")
+
     const { fullName, email, password, confPassword } = req.body
     const profileImagePath = req.files?.profileImage?.[0]?.path
 
@@ -198,21 +210,21 @@ const updateUser = asyncHandler(async (req, res) => {
             )
         }
 
-        req.user.password = password
-        await req.user.validate(["password"])
+        user.password = password
+        await user.validate(["password"])
     }
 
     if (email) {
         const { isValidEmail } = validateUserData(null, email)
         if (!isValidEmail) throw new ApiError(403, "Invalid Email!")
 
-        req.user.email = email
-        await req.user.validate(["email"])
+        user.email = email
+        await user.validate(["email"])
     }
 
     if (fullName) {
-        req.user.fullName = fullName
-        await req.user.validate(["fullName"])
+        user.fullName = fullName
+        await user.validate(["fullName"])
     }
 
     // uploading img to cloud
@@ -227,7 +239,7 @@ const updateUser = asyncHandler(async (req, res) => {
 
     // validating the given data
     try {
-        await req.user.save({ validateBeforeSave: false }) // update user
+        await user.save({ validateBeforeSave: false }) // update user
     } catch (error) {
         console.error(error)
         if (error instanceof mongo.MongoServerError && error.code === 11000) {
@@ -239,31 +251,26 @@ const updateUser = asyncHandler(async (req, res) => {
     // sending successfull
 
     res.status(201).json(
-        new ApiRespose(
-            201,
-            "User Updated Successfully!",
-            extractUserData(req.user)
-        )
+        new ApiRespose(201, "User Updated Successfully!", extractUserData(user))
     )
 })
 
 const activateUser = asyncHandler(async (req, res) => {
-    let statusCode = 401
     let user: InstanceType<typeof User> | null = null
 
     if (!(req.query.userId && req.query.token)) {
-        throw new ApiError(statusCode, "Activation token and user ID required")
+        throw new ApiError(401, "Activation token and user ID required")
     }
 
     try {
         user = await User.findById(req.query.userId)
     } catch (error) {
         console.error(error)
-        throw new ApiError(statusCode, "invalid user id")
+        throw new ApiError(401, "invalid user id")
     }
 
     if (!user?.activationToken || user.activationToken.expiresAt < new Date()) {
-        throw new ApiError(statusCode, "Activation token not found or expired!")
+        throw new ApiError(401, "Activation token not found or expired!")
     }
 
     const hashedToken = crypto
@@ -284,7 +291,7 @@ const activateUser = asyncHandler(async (req, res) => {
         throw new ApiError(500, "unable to activate the user")
     }
 
-    statusCode = 200
+    const statusCode = 200
     res.status(statusCode).json(
         new ApiRespose(statusCode, "user activated successfully")
     )

@@ -82,13 +82,13 @@ function extractUserData(user: InstanceType<typeof User>) {
 }
 
 async function getUser(
-    userId: string
+    username: string
 ): Promise<InstanceType<typeof User> | null> {
     let user = null
     try {
-        const user = await User.findById(userId)
+        user = await User.findOne({ username })
     } catch (error) {
-        throw new ApiError(500, "Unable to get user data")
+        console.error(error)
     }
 
     return user
