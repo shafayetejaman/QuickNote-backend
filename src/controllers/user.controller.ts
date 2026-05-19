@@ -9,6 +9,7 @@ import ApiError from "../utils/apiError"
 import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
 import imagefileUploder from "../utils/cloudnary"
+import { Payload } from "../customeInterface/customPlayload"
 import {
     cookieOptions,
     cookieOptionsWithPath,
@@ -18,7 +19,6 @@ import {
     setAccessAndRefereshToken,
     validateUserData,
 } from "./user.heper.controller"
-import { Payload } from "../customeInterface/customPlayload"
 
 const registerUser = asyncHandler(async (req, res) => {
     const data = req.body

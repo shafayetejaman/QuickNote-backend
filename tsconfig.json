@@ -23,5 +23,12 @@
         "src/middlewares/log.middleware.js",
         "src/templates/activationEmail.html"
     ],
-    "exclude": ["node_modules"]
+    "exclude": [
+        "node_modules",
+        "node_modules",
+        "dist",
+        "build",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+    ]
 }
