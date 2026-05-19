@@ -53,9 +53,6 @@ const userSchema = new mongoose.Schema<UserInterface>({
         enum: ["admin", "inactive", "deactivated", "active"],
         default: "inactive",
     },
-    refreshToken: {
-        type: String,
-    },
     profileImageUrl: {
         type: String,
     },
