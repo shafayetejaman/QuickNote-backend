@@ -291,10 +291,11 @@ const activateUser = asyncHandler(async (req, res) => {
         throw new ApiError(500, "unable to activate the user")
     }
 
-    const statusCode = 200
-    res.status(statusCode).json(
-        new ApiRespose(statusCode, "user activated successfully")
-    )
+    // const statusCode = 200
+    // res.status(statusCode).json(
+    //     new ApiRespose(statusCode, "user activated successfully")
+    // )
+    res.redirect(`${process.env.LOCAL_FRONTEND_URL}/login`)
 })
 
 export {
