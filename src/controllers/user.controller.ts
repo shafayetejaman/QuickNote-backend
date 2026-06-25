@@ -116,7 +116,6 @@ const loginUser = asyncHandler(async (req, res) => {
             new ApiRespose(statusCodoe, "user logged in!", {
                 accessToken,
                 refreshToken,
-                userId: user._id,
             })
         )
 })
