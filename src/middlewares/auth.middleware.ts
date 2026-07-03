@@ -3,8 +3,6 @@ import {
     cookieOptions,
     cookieOptionsWithPath,
 } from "../controllers/user.controller"
-import { cache } from "../db/db"
-import { User } from "../models/users.model"
 import ApiError from "../utils/apiError"
 import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
@@ -20,7 +18,7 @@ function validateJwtField(payload: any): payload is Payload {
     const keys = Object.keys(payload)
     const pKeys = ["_id", "username", "timeStamp", "role"]
 
-    for (const key in keys) {
+    for (const key of keys) {
         if (!pKeys.includes(key)) return false
     }
 
@@ -33,7 +31,7 @@ function validateJwtField(payload: any): payload is Payload {
 }
 
 export default asyncHandler(async (req, res, next) => {
-    let statusCode = 401
+    const statusCode = 401
     const accessToken =
         req.cookies.accessToken ||
         req.header("Authorization")?.replace("Bearer ", "")
