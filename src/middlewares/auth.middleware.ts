@@ -8,6 +8,7 @@ import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
 import { Payload } from "../customeInterface/customPlayload"
 
+// TODO: refector to express validator and class based param
 function validateJwtField(payload: any): payload is Payload {
     if (payload === null || typeof payload !== "object") return false
 

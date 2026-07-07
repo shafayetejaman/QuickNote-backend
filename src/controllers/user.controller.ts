@@ -148,10 +148,7 @@ const getRefreshToken = asyncHandler(async (req, res) => {
         req.cookies.refreshToken ||
         req.header("Authorization")?.replace("Bearer ", "")
 
-    const redirect = () =>
-        res.redirect(process.env.LOCAL_FRONTEND_URL + "/login")
-
-    if (!incommingRefreshToken) return redirect()
+    if (!incommingRefreshToken) throw new ApiError(403, "Refresh token needed!")
 
     let payload = null
     try {
@@ -161,13 +158,11 @@ const getRefreshToken = asyncHandler(async (req, res) => {
         ) as Payload
     } catch (error) {
         console.error(error)
-        return redirect()
+        throw new ApiError(403, "Refresh token invalid!")
     }
 
-    if (!payload) return redirect()
-
-    const user = await getUser(payload.username)
-    if (!user) return redirect()
+    const user = await getUser(payload?.username)
+    if (!user) throw new ApiError(403, "Refresh token invalid!")
 
     const { accessToken, refreshToken } = await setAccessAndRefereshToken(user)
 
