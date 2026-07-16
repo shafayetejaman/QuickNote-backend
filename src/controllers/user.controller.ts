@@ -281,5 +281,5 @@ export const activateUser = asyncHandler(async (req, res) => {
     // res.status(statusCode).json(
     //     new ApiRespose(statusCode, "user activated successfully")
     // )
-    return res.redirect(`${process.env.LOCAL_FRONTEND_URL}/login`)
+    return res.redirect(`${process.env.FRONTEND_URL}/login`)
 })
