@@ -7,5 +7,5 @@ export function validate(req, _res, next) {
         next()
     }
     const errors = result.array().map((error) => ({ [error.path]: error.msg }))
-    throw new ApiError("Invalid data sent", 400, null, errors)
+    throw new ApiError("Invalid data given!", 422, null, errors)
 }

@@ -8,29 +8,6 @@ import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
 import { Payload } from "../interfaces/customPlayload"
 
-// TODO: refector to express validator and class based param
-function validateJwtField(payload: any): payload is Payload {
-    if (payload === null || typeof payload !== "object") return false
-
-    if (payload.profileImageUrl) {
-        if (typeof payload.profileImageUrl !== "string") return false
-    }
-
-    const keys = Object.keys(payload)
-    const pKeys = ["_id", "username", "timeStamp", "role"]
-
-    for (const key of keys) {
-        if (!pKeys.includes(key)) return false
-    }
-
-    return (
-        typeof payload._id === "string" &&
-        typeof payload.username === "string" &&
-        typeof payload.timeStamp === "number" &&
-        typeof payload.role === "string"
-    )
-}
-
 export default asyncHandler(async (req, res, next) => {
     const statusCode = 401
     const accessToken =
@@ -53,7 +30,7 @@ export default asyncHandler(async (req, res, next) => {
         )
         return new ApiRespose("Access Token Invalid!", statusCode).send(res)
     }
-    if (validateJwtField(payload)) req.user = payload
+    req.user = payload as Payload
 
     next()
 })
