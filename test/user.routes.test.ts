@@ -25,8 +25,11 @@ describe("POST /api/v1/users/register", () => {
             .field("email", "newuser@example.com")
             .field("password", "StrongPass1")
 
+        expect(typeof res.status).toBe("number")
+        expect(typeof res.body.success).toBe("boolean")
         expect(res.status).toBe(201)
         expect(res.body.success).toBe(true)
+        expect(typeof res.body.data.username).toBe("string")
         expect(res.body.data.username).toBe("newuser")
         expect(res.body.data).not.toHaveProperty("password")
     })
@@ -39,6 +42,8 @@ describe("POST /api/v1/users/register", () => {
             .field("email", "noimage@example.com")
             .field("password", "StrongPass1")
 
+        expect(typeof res.status).toBe("number")
+        expect(typeof res.body.success).toBe("boolean")
         expect(res.status).toBe(201)
         expect(res.body.success).toBe(true)
     })
@@ -48,6 +53,8 @@ describe("POST /api/v1/users/register", () => {
             .post("/api/v1/users/register")
             .field("username", "incomplete")
 
+        expect(typeof res.status).toBe("number")
+        expect(typeof res.body.success).toBe("boolean")
         expect(res.status).toBe(400)
         expect(res.body.success).toBe(false)
     })
@@ -60,6 +67,8 @@ describe("POST /api/v1/users/register", () => {
             .field("email", "weak@example.com")
             .field("password", "abc")
 
+        expect(typeof res.status).toBe("number")
+        expect(typeof res.body.success).toBe("boolean")
         expect(res.status).toBe(403)
         expect(res.body.success).toBe(false)
     })
@@ -72,6 +81,8 @@ describe("POST /api/v1/users/register", () => {
             .field("email", "not-an-email")
             .field("password", "StrongPass1")
 
+        expect(typeof res.status).toBe("number")
+        expect(typeof res.body.success).toBe("boolean")
         expect(res.status).toBe(403)
         expect(res.body.success).toBe(false)
     })
@@ -91,6 +102,8 @@ describe("POST /api/v1/users/register", () => {
             .field("email", "duplicate@example.com")
             .field("password", "StrongPass1")
 
+        expect(typeof res.status).toBe("number")
+        expect(typeof res.body.success).toBe("boolean")
         expect(res.status).toBe(409)
         expect(res.body.success).toBe(false)
     })
@@ -107,10 +120,27 @@ describe("POST /api/v1/users/login", () => {
             .post("/api/v1/users/login")
             .send({ username: "loginuser", password: "password123" })
 
+        expect(typeof res.status).toBe("number")
+        expect(typeof res.body.success).toBe("boolean")
         expect(res.status).toBe(202)
         expect(res.body.success).toBe(true)
+        expect(typeof res.body.data.accessToken).toBe("string")
+        expect(typeof res.body.data.refreshToken).toBe("string")
         expect(res.body.data).toHaveProperty("accessToken")
         expect(res.body.data).toHaveProperty("refreshToken")
+        expect(typeof res.body.data.user.id).toBe("string")
+        expect(typeof res.body.data.user.username).toBe("string")
+        expect(typeof res.body.data.user.email).toBe("string")
+        expect(typeof res.body.data.user.fullName).toBe("string")
+        expect(typeof res.body.data.user.role).toBe("string")
+        expect(res.body.data.user).toHaveProperty("id")
+        expect(res.body.data.user).toHaveProperty("username")
+        expect(res.body.data.user).toHaveProperty("email")
+        expect(res.body.data.user).toHaveProperty("fullName")
+        expect(res.body.data.user).toHaveProperty("role")
+        expect(res.body.data.user).not.toHaveProperty("password")
+        expect(res.body.data.user).not.toHaveProperty("activationToken")
+        expect(res.body.data.user).not.toHaveProperty("refreshToken")
     })
 
     it("should fail with wrong password", async () => {
@@ -123,6 +153,8 @@ describe("POST /api/v1/users/login", () => {
             .post("/api/v1/users/login")
             .send({ username: "wrongpass", password: "wrongpassword" })
 
+        expect(typeof res.status).toBe("number")
+        expect(typeof res.body.success).toBe("boolean")
         expect(res.status).toBe(404)
         expect(res.body.success).toBe(false)
     })
@@ -132,6 +164,8 @@ describe("POST /api/v1/users/login", () => {
             .post("/api/v1/users/login")
             .send({ username: "nonexistent", password: "password123" })
 
+        expect(typeof res.status).toBe("number")
+        expect(typeof res.body.success).toBe("boolean")
         expect(res.status).toBe(404)
         expect(res.body.success).toBe(false)
     })
@@ -147,6 +181,8 @@ describe("POST /api/v1/users/login", () => {
             .post("/api/v1/users/login")
             .send({ username: "inactiveuser", password: "password123" })
 
+        expect(typeof res.status).toBe("number")
+        expect(typeof res.body.success).toBe("boolean")
         expect(res.status).toBe(403)
         expect(res.body.success).toBe(false)
     })
@@ -162,6 +198,8 @@ describe("POST /api/v1/users/login", () => {
             .post("/api/v1/users/login")
             .send({ username: "deactivated", password: "password123" })
 
+        expect(typeof res.status).toBe("number")
+        expect(typeof res.body.success).toBe("boolean")
         expect(res.status).toBe(403)
         expect(res.body.success).toBe(false)
     })
@@ -169,6 +207,8 @@ describe("POST /api/v1/users/login", () => {
     it("should fail with missing credentials", async () => {
         const res = await request(app).post("/api/v1/users/login").send({})
 
+        expect(typeof res.status).toBe("number")
+        expect(typeof res.body.success).toBe("boolean")
         expect(res.status).toBe(404)
         expect(res.body.success).toBe(false)
     })
@@ -199,6 +239,7 @@ describe("GET /api/v1/users/activate", () => {
             .get("/api/v1/users/activate")
             .query({ userId: user._id.toString(), token })
 
+        expect(typeof res.status).toBe("number")
         expect(res.status).toBe(302)
 
         const updatedUser = await User.findById(user._id)
@@ -228,6 +269,8 @@ describe("GET /api/v1/users/activate", () => {
             .get("/api/v1/users/activate")
             .query({ userId: user._id.toString(), token: "wrong-token" })
 
+        expect(typeof res.status).toBe("number")
+        expect(typeof res.body.success).toBe("boolean")
         expect(res.status).toBe(403)
         expect(res.body.success).toBe(false)
     })
@@ -256,6 +299,8 @@ describe("GET /api/v1/users/activate", () => {
             .get("/api/v1/users/activate")
             .query({ userId: user._id.toString(), token })
 
+        expect(typeof res.status).toBe("number")
+        expect(typeof res.body.success).toBe("boolean")
         expect(res.status).toBe(401)
         expect(res.body.success).toBe(false)
     })
@@ -263,6 +308,8 @@ describe("GET /api/v1/users/activate", () => {
     it("should fail with missing parameters", async () => {
         const res = await request(app).get("/api/v1/users/activate").query({})
 
+        expect(typeof res.status).toBe("number")
+        expect(typeof res.body.success).toBe("boolean")
         expect(res.status).toBe(401)
         expect(res.body.success).toBe(false)
     })
@@ -285,12 +332,14 @@ describe("GET /api/v1/users/get-refresh-token", () => {
             .get("/api/v1/users/get-refresh-token")
             .set("Cookie", [`refreshToken=${refreshToken}`])
 
+        expect(typeof res.status).toBe("number")
         expect(res.status).toBe(403)
     })
 
     it("should redirect without refresh token", async () => {
         const res = await request(app).get("/api/v1/users/get-refresh-token")
 
+        expect(typeof res.status).toBe("number")
         expect(res.status).toBe(403)
     })
 
@@ -299,6 +348,7 @@ describe("GET /api/v1/users/get-refresh-token", () => {
             .get("/api/v1/users/get-refresh-token")
             .set("Cookie", ["refreshToken=invalid-jwt-token"])
 
+        expect(typeof res.status).toBe("number")
         expect(res.status).toBe(403)
     })
 })
@@ -320,12 +370,15 @@ describe("GET /api/v1/users/logout", () => {
             .get("/api/v1/users/logout")
             .set("Authorization", `Bearer ${accessToken}`)
 
+        expect(typeof res.status).toBe("number")
         expect(res.status).toBe(500)
     })
 
     it("should fail without auth token", async () => {
         const res = await request(app).get("/api/v1/users/logout")
 
+        expect(typeof res.status).toBe("number")
+        expect(typeof res.body.success).toBe("boolean")
         expect(res.status).toBe(401)
         expect(res.body.success).toBe(false)
     })
@@ -351,6 +404,7 @@ describe("POST /api/v1/users/update-user-data", () => {
             .set("Authorization", `Bearer ${token}`)
             .field("fullName", "Updated Name")
 
+        expect(typeof res.status).toBe("number")
         expect(res.status).toBe(500)
     })
 
@@ -359,6 +413,8 @@ describe("POST /api/v1/users/update-user-data", () => {
             .post("/api/v1/users/update-user-data")
             .field("fullName", "No Auth")
 
+        expect(typeof res.status).toBe("number")
+        expect(typeof res.body.success).toBe("boolean")
         expect(res.status).toBe(401)
         expect(res.body.success).toBe(false)
     })

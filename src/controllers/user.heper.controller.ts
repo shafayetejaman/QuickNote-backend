@@ -78,10 +78,10 @@ export async function sendEmailWithActivationToken(
 }
 
 export function extractUserData(user: InstanceType<typeof User>) {
-    const { password, refreshToken, activationToken, ...userData } =
+    const { password, refreshToken, activationToken, _id, ...userData } =
         user.toObject()
 
-    return userData
+    return { id: _id.toString(), ...userData }
 }
 
 export async function getUser(
