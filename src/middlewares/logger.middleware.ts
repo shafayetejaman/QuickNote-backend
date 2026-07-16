@@ -36,7 +36,7 @@ interface LogObject {
     responseTime: string
 }
 
-const formatter = morgan(morganFormat, {
+export const formatter = morgan(morganFormat, {
     stream: {
         write: (message: string): void => {
             const status: string[] = message.trim().split(" ")
@@ -74,5 +74,3 @@ const formatter = morgan(morganFormat, {
         },
     },
 })
-
-export default formatter

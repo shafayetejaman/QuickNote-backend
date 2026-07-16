@@ -20,7 +20,7 @@ import {
     validateUserData,
 } from "./user.heper.controller"
 
-const registerUser = asyncHandler(async (req, res) => {
+export const registerUser = asyncHandler(async (req, res) => {
     const data = req.body
 
     // chacking for missing fields
@@ -84,7 +84,7 @@ const registerUser = asyncHandler(async (req, res) => {
     )
 })
 
-const loginUser = asyncHandler(async (req, res) => {
+export const loginUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body
 
     if (typeof username !== "string" || typeof password !== "string") {
@@ -108,19 +108,20 @@ const loginUser = asyncHandler(async (req, res) => {
 
     cache.set(username, user)
 
-    const statusCodoe = 202
+    const statusCode = 202
     res.cookie("accessToken", accessToken, cookieOptions)
         .cookie("refreshToken", refreshToken, cookieOptionsWithPath)
-        .status(statusCodoe)
+        .status(statusCode)
         .json(
-            new ApiRespose(statusCodoe, "user logged in!", {
+            new ApiRespose(statusCode, "user logged in!", {
                 accessToken,
                 refreshToken,
+                user: extractUserData(user),
             })
         )
 })
 
-const logoutUser = asyncHandler(async (req, res) => {
+export const logoutUser = asyncHandler(async (req, res) => {
     if (!req.user) throw new ApiError()
 
     const user = await getUser(req.user.username)
@@ -143,7 +144,7 @@ const logoutUser = asyncHandler(async (req, res) => {
         .json(new ApiRespose(statusCodoe, "user logged out!"))
 })
 
-const getRefreshToken = asyncHandler(async (req, res) => {
+export const getRefreshToken = asyncHandler(async (req, res) => {
     const incommingRefreshToken =
         req.cookies.refreshToken ||
         req.header("Authorization")?.replace("Bearer ", "")
@@ -180,7 +181,7 @@ const getRefreshToken = asyncHandler(async (req, res) => {
         )
 })
 
-const updateUser = asyncHandler(async (req, res) => {
+export const updateUser = asyncHandler(async (req, res) => {
     if (!req.user) throw new ApiError()
 
     const user = await getUser(req.user.username)
@@ -250,7 +251,7 @@ const updateUser = asyncHandler(async (req, res) => {
     )
 })
 
-const activateUser = asyncHandler(async (req, res) => {
+export const activateUser = asyncHandler(async (req, res) => {
     let user: InstanceType<typeof User> | null = null
 
     if (!(req.query.userId && req.query.token)) {
@@ -292,14 +293,3 @@ const activateUser = asyncHandler(async (req, res) => {
     // )
     res.redirect(`${process.env.LOCAL_FRONTEND_URL}/login`)
 })
-
-export {
-    activateUser,
-    cookieOptions,
-    cookieOptionsWithPath,
-    getRefreshToken,
-    loginUser,
-    logoutUser,
-    registerUser,
-    updateUser,
-}

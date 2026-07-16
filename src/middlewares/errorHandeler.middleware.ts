@@ -1,7 +1,7 @@
 import { ErrorRequestHandler } from "express"
 import ApiError from "../utils/apiError"
 
-const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     if (err instanceof ApiError && err?.statusCode) {
         res.status(err.statusCode).json(err)
     } else {
@@ -9,5 +9,3 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     }
     next()
 }
-
-export default errorHandler

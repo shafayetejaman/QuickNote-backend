@@ -5,18 +5,18 @@ import { User } from "../models/users.model"
 import ApiError from "../utils/apiError"
 import EmailService from "../utils/sendMail"
 
-const cookieOptions = {
+export const cookieOptions = {
     // Use security feature only in production
     httpOnly: process.env.NODE_ENV === "production",
     secure: process.env.NODE_ENV === "production",
 }
 
-const cookieOptionsWithPath = {
+export const cookieOptionsWithPath = {
     ...cookieOptions,
     path: "/api/v1/users/get-refresh-token",
 }
 
-function validateUserData(
+export function validateUserData(
     password: string | null = null,
     email: string | null = null
 ) {
@@ -40,7 +40,7 @@ function validateUserData(
 
     return { isStrongPassword, isValidEmail }
 }
-async function setAccessAndRefereshToken(user: InstanceType<typeof User>) {
+export async function setAccessAndRefereshToken(user: InstanceType<typeof User>) {
     const accessToken = await user.generateAccessToken()
     const refreshToken = await user.generateRefreshToken()
 
@@ -55,7 +55,7 @@ async function setAccessAndRefereshToken(user: InstanceType<typeof User>) {
 
     return { accessToken, refreshToken }
 }
-async function sendEmailWithActivationToken(user: InstanceType<typeof User>) {
+export async function sendEmailWithActivationToken(user: InstanceType<typeof User>) {
     const { token, expiresAt } = await user.generateActivationToken()
     const hasedToken = crypto
         .createHash("sha256")
@@ -74,14 +74,14 @@ async function sendEmailWithActivationToken(user: InstanceType<typeof User>) {
     console.log("Emailservice Respose: ", info)
 }
 
-function extractUserData(user: InstanceType<typeof User>) {
+export function extractUserData(user: InstanceType<typeof User>) {
     const { password, refreshToken, activationToken, ...userData } =
         user.toObject()
 
     return userData
 }
 
-async function getUser(
+export async function getUser(
     username: string
 ): Promise<InstanceType<typeof User> | null> {
     let user = null
@@ -92,14 +92,4 @@ async function getUser(
     }
 
     return user
-}
-
-export {
-    cookieOptions,
-    cookieOptionsWithPath,
-    getUser,
-    extractUserData,
-    sendEmailWithActivationToken,
-    setAccessAndRefereshToken,
-    validateUserData,
 }

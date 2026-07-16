@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken"
 import {
     cookieOptions,
     cookieOptionsWithPath,
-} from "../controllers/user.controller"
+} from "../controllers/user.heper.controller"
 import ApiError from "../utils/apiError"
 import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"

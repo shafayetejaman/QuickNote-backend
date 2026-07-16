@@ -1,7 +1,7 @@
 import { NextFunction, RequestHandler, Response } from "express"
 import { CustomRequest } from "../customeInterface/customRequest"
 
-function asyncHandler(
+export default function asyncHandler(
     func: (
         req: CustomRequest,
         res: Response,
@@ -17,5 +17,3 @@ function asyncHandler(
         )
     }
 }
-
-export default asyncHandler

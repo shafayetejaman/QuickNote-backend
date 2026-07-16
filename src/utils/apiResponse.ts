@@ -1,4 +1,4 @@
-class ApiRespose {
+export default class ApiRespose {
     success: boolean
 
     constructor(
@@ -9,5 +9,3 @@ class ApiRespose {
         this.success = statusCode < 400
     }
 }
-
-export default ApiRespose

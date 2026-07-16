@@ -9,7 +9,7 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 // Upload an image
-async function imagefileUploder(filePath: string) {
+export default async function imagefileUploder(filePath: string) {
     if (!filePath) return null
 
     try {
@@ -34,5 +34,3 @@ async function imagefileUploder(filePath: string) {
         throw new ApiError(500, "Image Upload Field!")
     }
 }
-
-export default imagefileUploder
