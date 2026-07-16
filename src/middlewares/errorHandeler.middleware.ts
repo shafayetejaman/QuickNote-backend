@@ -8,9 +8,8 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, next) => {
     console.error("===========================\n")
 
     if (err instanceof ApiError && err?.statusCode) {
-        res.status(err.statusCode).json(err)
+        return res.status(err.statusCode).json(err)
     } else {
-        res.status(500).json(new ApiError())
+        return res.status(500).json(new ApiError())
     }
-    next()
 }
