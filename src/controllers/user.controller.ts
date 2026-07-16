@@ -36,7 +36,9 @@ export const registerUser = asyncHandler(async (req, res) => {
                 console.log(error)
             })
         }
-        throw new ApiError(400, "Missing or invalid fields", { missingFields })
+        throw new ApiError("Missing or invalid fields", 400, null, {
+            missingFields,
+        })
     }
 
     const { isStrongPassword, isValidEmail } = validateUserData(
@@ -46,14 +48,14 @@ export const registerUser = asyncHandler(async (req, res) => {
 
     if (!isStrongPassword) {
         throw new ApiError(
-            403,
             `Password must contain at least 8 characters, ` +
                 `including 1 letter, ` +
-                `and 1 number`
+                `and 1 number`,
+            403
         )
     }
 
-    if (!isValidEmail) throw new ApiError(403, "Invalid Email!")
+    if (!isValidEmail) throw new ApiError("Invalid Email!", 403)
     const user = new User(data)
 
     let cloudinaryRespose: UploadApiResponse | null = null
@@ -73,35 +75,37 @@ export const registerUser = asyncHandler(async (req, res) => {
     } catch (error) {
         console.error(error)
         if (error instanceof mongo.MongoServerError && error.code === 11000) {
-            throw new ApiError(409, "Dublicate Email or Username")
+            throw new ApiError("Dublicate Email or Username", 409)
         }
-        throw new ApiError(400, "Unable to create the user profile!")
+        throw new ApiError("Unable to create the user profile!", 400)
     }
 
     // sending successfull
-    res.status(201).json(
-        new ApiRespose(201, "User created Successfully!", extractUserData(user))
-    )
+    return new ApiRespose(
+        "User created Successfully!",
+        201,
+        extractUserData(user)
+    ).send(res)
 })
 
 export const loginUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body
 
     if (typeof username !== "string" || typeof password !== "string") {
-        throw new ApiError(404, "username or password is invalid!")
+        throw new ApiError("username or password is invalid!", 404)
     }
 
     const user = await getUser(username)
 
     if (!user || !(await user?.isPasswordMatch(password))) {
-        throw new ApiError(404, "username or password is incorrect!")
+        throw new ApiError("username or password is incorrect!", 404)
     }
     // making sure the user valid for login
     if (user.role === "inactive") {
-        throw new ApiError(403, "user needs to be acctivated before login!")
+        throw new ApiError("user needs to be acctivated before login!", 403)
     }
     if (user.role === "deactivated") {
-        throw new ApiError(403, "user has been diactivated")
+        throw new ApiError("user has been diactivated", 403)
     }
 
     const { accessToken, refreshToken } = await setAccessAndRefereshToken(user)
@@ -109,39 +113,36 @@ export const loginUser = asyncHandler(async (req, res) => {
     cache.set(username, user)
 
     const statusCode = 202
-    res.cookie("accessToken", accessToken, cookieOptions)
-        .cookie("refreshToken", refreshToken, cookieOptionsWithPath)
-        .status(statusCode)
-        .json(
-            new ApiRespose(statusCode, "user logged in!", {
-                accessToken,
-                refreshToken,
-                user: extractUserData(user),
-            })
-        )
+    res.cookie("accessToken", accessToken, cookieOptions).cookie(
+        "refreshToken",
+        refreshToken,
+        cookieOptionsWithPath
+    )
+
+    return new ApiRespose("user logged in!", statusCode, {
+        accessToken,
+        refreshToken,
+        user: extractUserData(user),
+    }).send(res)
 })
 
 export const logoutUser = asyncHandler(async (req, res) => {
     if (!req.user) throw new ApiError()
 
     const user = await getUser(req.user.username)
-    if (!user) throw new ApiError(500, "Unable to find user")
+    if (!user) throw new ApiError("Unable to find user", 500)
 
     cache.del(req.user.username)
     user.refreshToken = undefined
 
-    try {
-        await user.save()
-    } catch (error) {
-        console.error(error)
-        throw new ApiError(500, "Unable to logout user!")
-    }
+    await user.save()
 
-    const statusCodoe = 200
-    res.clearCookie("accessToken", cookieOptions)
-        .clearCookie("refreshToken", cookieOptionsWithPath)
-        .status(statusCodoe)
-        .json(new ApiRespose(statusCodoe, "user logged out!"))
+    res.clearCookie("accessToken", cookieOptions).clearCookie(
+        "refreshToken",
+        cookieOptionsWithPath
+    )
+
+    return new ApiRespose("user logged out!").send(res)
 })
 
 export const getRefreshToken = asyncHandler(async (req, res) => {
@@ -149,9 +150,9 @@ export const getRefreshToken = asyncHandler(async (req, res) => {
         req.cookies.refreshToken ||
         req.header("Authorization")?.replace("Bearer ", "")
 
-    if (!incommingRefreshToken) throw new ApiError(403, "Refresh token needed!")
+    if (!incommingRefreshToken) throw new ApiError("Refresh token needed!", 403)
 
-    let payload = null
+    let payload
     try {
         payload = jwt.verify(
             incommingRefreshToken,
@@ -159,50 +160,51 @@ export const getRefreshToken = asyncHandler(async (req, res) => {
         ) as Payload
     } catch (error) {
         console.error(error)
-        throw new ApiError(403, "Refresh token invalid!")
+        throw new ApiError("Refresh token invalid!", 403)
     }
 
     const user = await getUser(payload?.username)
-    if (!user) throw new ApiError(403, "Refresh token invalid!")
+    if (!user) throw new ApiError("Refresh token invalid!", 403)
 
     const { accessToken, refreshToken } = await setAccessAndRefereshToken(user)
 
     cache.set(user.username, user)
 
     const statusCodoe = 202
-    res.cookie("accessToken", accessToken, cookieOptions)
-        .cookie("refreshToken", refreshToken, cookieOptionsWithPath)
-        .status(statusCodoe)
-        .json(
-            new ApiRespose(statusCodoe, "User Token refreshed!", {
-                accessToken,
-                refreshToken,
-            })
-        )
+    res.cookie("accessToken", accessToken, cookieOptions).cookie(
+        "refreshToken",
+        refreshToken,
+        cookieOptionsWithPath
+    )
+
+    return new ApiRespose("User Token refreshed!", statusCodoe, {
+        accessToken,
+        refreshToken,
+    }).send(res)
 })
 
 export const updateUser = asyncHandler(async (req, res) => {
     if (!req.user) throw new ApiError()
 
     const user = await getUser(req.user.username)
-    if (!user) throw new ApiError(500, "Unable to find user")
+    if (!user) throw new ApiError("Unable to find user", 500)
 
     const { fullName, email, password, confPassword } = req.body
     const profileImagePath = req.files?.profileImage?.[0]?.path
 
     if (password && confPassword) {
         if (password !== confPassword) {
-            throw new ApiError(403, "Password did not match!")
+            throw new ApiError("Password did not match!", 403)
         }
 
         const { isStrongPassword } = validateUserData(password)
 
         if (!isStrongPassword) {
             throw new ApiError(
-                403,
                 `Password must contain at least 8 characters,` +
                     `including 1 uppercase letter, ` +
-                    `1 lowercase letter, and 1 number`
+                    `1 lowercase letter, and 1 number`,
+                403
             )
         }
 
@@ -212,7 +214,7 @@ export const updateUser = asyncHandler(async (req, res) => {
 
     if (email) {
         const { isValidEmail } = validateUserData(null, email)
-        if (!isValidEmail) throw new ApiError(403, "Invalid Email!")
+        if (!isValidEmail) throw new ApiError("Invalid Email!", 403)
 
         user.email = email
         await user.validate(["email"])
@@ -239,34 +241,34 @@ export const updateUser = asyncHandler(async (req, res) => {
     } catch (error) {
         console.error(error)
         if (error instanceof mongo.MongoServerError && error.code === 11000) {
-            throw new ApiError(409, "Dublicate Email")
+            throw new ApiError("Dublicate Email", 409)
         }
 
-        throw new ApiError(400, "Unable to update the user profile!")
+        throw new ApiError("Unable to update the user profile!", 400)
     }
     // sending successfull
-
-    res.status(201).json(
-        new ApiRespose(201, "User Updated Successfully!", extractUserData(user))
-    )
+    return new ApiRespose(
+        "User Updated Successfully!",
+        201,
+        extractUserData(user)
+    ).send(res)
 })
 
 export const activateUser = asyncHandler(async (req, res) => {
-    let user: InstanceType<typeof User> | null = null
+    let user
 
     if (!(req.query.userId && req.query.token)) {
-        throw new ApiError(401, "Activation token and user ID required")
+        throw new ApiError("Activation token and user ID required", 401)
     }
 
     try {
         user = await User.findById(req.query.userId)
     } catch (error) {
-        console.error(error)
-        throw new ApiError(401, "invalid user id")
+        throw new ApiError("invalid user id", 401, error)
     }
 
     if (!user?.activationToken || user.activationToken.expiresAt < new Date()) {
-        throw new ApiError(401, "Activation token not found or expired!")
+        throw new ApiError("Activation token not found or expired!", 401)
     }
 
     const hashedToken = crypto
@@ -275,21 +277,17 @@ export const activateUser = asyncHandler(async (req, res) => {
         .digest("base64url")
 
     if (hashedToken !== user.activationToken.token) {
-        throw new ApiError(403, "invalid token!")
+        throw new ApiError("invalid token!", 403)
     }
 
     user.role = "active"
     user.activationToken = undefined
-    try {
-        await user.save()
-    } catch (error) {
-        console.error(error)
-        throw new ApiError(500, "unable to activate the user")
-    }
+
+    await user.save()
 
     // const statusCode = 200
     // res.status(statusCode).json(
     //     new ApiRespose(statusCode, "user activated successfully")
     // )
-    res.redirect(`${process.env.LOCAL_FRONTEND_URL}/login`)
+    return res.redirect(`${process.env.LOCAL_FRONTEND_URL}/login`)
 })

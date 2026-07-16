@@ -31,6 +31,6 @@ export default async function imagefileUploder(filePath: string) {
         fs.unlink(filePath, (error) => {
             console.error(error)
         })
-        throw new ApiError(500, "Image Upload Field!")
+        throw new ApiError("Image Upload Field!", 500)
     }
 }

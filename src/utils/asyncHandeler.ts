@@ -6,7 +6,7 @@ export default function asyncHandler(
         req: CustomRequest,
         res: Response,
         next: NextFunction
-    ) => Promise<any>
+    ) => Promise<unknown>
 ): RequestHandler {
     return (req, res, next) => {
         Promise.resolve(func(req as CustomRequest, res, next)).catch(

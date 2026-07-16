@@ -50,7 +50,7 @@ export async function setAccessAndRefereshToken(user: InstanceType<typeof User>)
         await user.save()
     } catch (error) {
         console.error(error)
-        throw new ApiError(500, "Unable to login the user")
+        throw new ApiError("Unable to login the user", 500)
     }
 
     return { accessToken, refreshToken }
@@ -67,7 +67,7 @@ export async function sendEmailWithActivationToken(user: InstanceType<typeof Use
     try {
         await user.save()
     } catch (error) {
-        throw new ApiError(500, "Unable to generate activation token")
+        throw new ApiError("Unable to generate activation token", 500)
     }
 
     const info = await EmailService.send(user, token)

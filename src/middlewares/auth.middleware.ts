@@ -37,9 +37,9 @@ export default asyncHandler(async (req, res, next) => {
         req.cookies.accessToken ||
         req.header("Authorization")?.replace("Bearer ", "")
 
-    if (!accessToken) throw new ApiError(statusCode, "Access Token required!")
+    if (!accessToken) throw new ApiError("Access Token required!", statusCode)
 
-    let payload = null
+    let payload
     try {
         payload = jwt.verify(
             accessToken,
@@ -47,11 +47,11 @@ export default asyncHandler(async (req, res, next) => {
         )
     } catch (error) {
         console.error(error)
-        return res
-            .clearCookie("accessToken", cookieOptions)
-            .clearCookie("refreshToken", cookieOptionsWithPath)
-            .status(statusCode)
-            .json(new ApiRespose(statusCode, "Access Token Invalid!"))
+        res.clearCookie("accessToken", cookieOptions).clearCookie(
+            "refreshToken",
+            cookieOptionsWithPath
+        )
+        return new ApiRespose("Access Token Invalid!", statusCode).send(res)
     }
     if (validateJwtField(payload)) req.user = payload
 
