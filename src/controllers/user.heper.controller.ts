@@ -40,7 +40,9 @@ export function validateUserData(
 
     return { isStrongPassword, isValidEmail }
 }
-export async function setAccessAndRefereshToken(user: InstanceType<typeof User>) {
+export async function setAccessAndRefereshToken(
+    user: InstanceType<typeof User>
+) {
     const accessToken = await user.generateAccessToken()
     const refreshToken = await user.generateRefreshToken()
 
@@ -49,13 +51,14 @@ export async function setAccessAndRefereshToken(user: InstanceType<typeof User>)
     try {
         await user.save()
     } catch (error) {
-        console.error(error)
-        throw new ApiError("Unable to login the user", 500)
+        throw new ApiError("Unable to login the user", 500, error)
     }
 
     return { accessToken, refreshToken }
 }
-export async function sendEmailWithActivationToken(user: InstanceType<typeof User>) {
+export async function sendEmailWithActivationToken(
+    user: InstanceType<typeof User>
+) {
     const { token, expiresAt } = await user.generateActivationToken()
     const hasedToken = crypto
         .createHash("sha256")
@@ -67,7 +70,7 @@ export async function sendEmailWithActivationToken(user: InstanceType<typeof Use
     try {
         await user.save()
     } catch (error) {
-        throw new ApiError("Unable to generate activation token", 500)
+        throw new ApiError("Unable to generate activation token", 500, error)
     }
 
     const info = await EmailService.send(user, token)

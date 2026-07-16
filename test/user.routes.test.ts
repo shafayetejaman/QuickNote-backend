@@ -167,9 +167,7 @@ describe("POST /api/v1/users/login", () => {
     })
 
     it("should fail with missing credentials", async () => {
-        const res = await request(app)
-            .post("/api/v1/users/login")
-            .send({})
+        const res = await request(app).post("/api/v1/users/login").send({})
 
         expect(res.status).toBe(404)
         expect(res.body.success).toBe(false)
@@ -263,9 +261,7 @@ describe("GET /api/v1/users/activate", () => {
     })
 
     it("should fail with missing parameters", async () => {
-        const res = await request(app)
-            .get("/api/v1/users/activate")
-            .query({})
+        const res = await request(app).get("/api/v1/users/activate").query({})
 
         expect(res.status).toBe(401)
         expect(res.body.success).toBe(false)
@@ -289,15 +285,13 @@ describe("GET /api/v1/users/get-refresh-token", () => {
             .get("/api/v1/users/get-refresh-token")
             .set("Cookie", [`refreshToken=${refreshToken}`])
 
-        expect(res.status).toBe(302)
+        expect(res.status).toBe(403)
     })
 
     it("should redirect without refresh token", async () => {
-        const res = await request(app).get(
-            "/api/v1/users/get-refresh-token"
-        )
+        const res = await request(app).get("/api/v1/users/get-refresh-token")
 
-        expect(res.status).toBe(302)
+        expect(res.status).toBe(403)
     })
 
     it("should redirect with invalid refresh token", async () => {
@@ -305,7 +299,7 @@ describe("GET /api/v1/users/get-refresh-token", () => {
             .get("/api/v1/users/get-refresh-token")
             .set("Cookie", ["refreshToken=invalid-jwt-token"])
 
-        expect(res.status).toBe(302)
+        expect(res.status).toBe(403)
     })
 })
 

@@ -6,7 +6,7 @@ import {
 import ApiError from "../utils/apiError"
 import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
-import { Payload } from "../customeInterface/customPlayload"
+import { Payload } from "../interfaces/customPlayload"
 
 // TODO: refector to express validator and class based param
 function validateJwtField(payload: any): payload is Payload {

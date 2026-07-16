@@ -20,7 +20,6 @@
     },
     "include": [
         "src/**/*.ts",
-        "src/middlewares/log.middleware.js",
         "src/templates/activationEmail.html"
     ],
     "exclude": [

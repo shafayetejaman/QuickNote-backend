@@ -1,4 +1,4 @@
-import { Payload } from "../customeInterface/customPlayload"
+import { Payload } from "../interfaces/customPlayload"
 
 export function validateJwtField(payload: unknown): payload is Payload {
     if (!payload) return false
@@ -24,5 +24,3 @@ export function validateJwtField(payload: unknown): payload is Payload {
         typeof _payload.role === "string"
     )
 }
-
-export function 

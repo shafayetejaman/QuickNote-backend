@@ -55,7 +55,8 @@ beforeEach(async () => {
 })
 
 afterEach(async () => {
-    const session = (global as any).__testSession as mongoose.ClientSession | undefined
+    const session = (global as any).__testSession as
+        mongoose.ClientSession | undefined
     if (session) {
         await session.abortTransaction()
         await session.endSession()

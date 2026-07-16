@@ -9,7 +9,7 @@ import ApiError from "../utils/apiError"
 import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
 import imagefileUploder from "../utils/cloudnary"
-import { Payload } from "../customeInterface/customPlayload"
+import { Payload } from "../interfaces/customPlayload"
 import {
     cookieOptions,
     cookieOptionsWithPath,
@@ -73,11 +73,10 @@ export const registerUser = asyncHandler(async (req, res) => {
         // genrerate token and store it to the DB and send to user via email
         await sendEmailWithActivationToken(user)
     } catch (error) {
-        console.error(error)
         if (error instanceof mongo.MongoServerError && error.code === 11000) {
-            throw new ApiError("Dublicate Email or Username", 409)
+            throw new ApiError("Dublicate Email or Username", 409, error)
         }
-        throw new ApiError("Unable to create the user profile!", 400)
+        throw new ApiError("Unable to create the user profile!", 400, error)
     }
 
     // sending successfull
@@ -159,8 +158,7 @@ export const getRefreshToken = asyncHandler(async (req, res) => {
             process.env.JWT_REFRESH_TOKEN as string
         ) as Payload
     } catch (error) {
-        console.error(error)
-        throw new ApiError("Refresh token invalid!", 403)
+        throw new ApiError("Refresh token invalid!", 403, error)
     }
 
     const user = await getUser(payload?.username)
@@ -239,12 +237,11 @@ export const updateUser = asyncHandler(async (req, res) => {
     try {
         await user.save({ validateBeforeSave: false }) // update user
     } catch (error) {
-        console.error(error)
         if (error instanceof mongo.MongoServerError && error.code === 11000) {
-            throw new ApiError("Dublicate Email", 409)
+            throw new ApiError("Dublicate Email", 409, error)
         }
 
-        throw new ApiError("Unable to update the user profile!", 400)
+        throw new ApiError("Unable to update the user profile!", 400, error)
     }
     // sending successfull
     return new ApiRespose(
@@ -255,17 +252,12 @@ export const updateUser = asyncHandler(async (req, res) => {
 })
 
 export const activateUser = asyncHandler(async (req, res) => {
-    let user
-
     if (!(req.query.userId && req.query.token)) {
         throw new ApiError("Activation token and user ID required", 401)
     }
 
-    try {
-        user = await User.findById(req.query.userId)
-    } catch (error) {
-        throw new ApiError("invalid user id", 401, error)
-    }
+    const user = await User.findById(req.query.userId)
+    if (!user) throw new ApiError("invalid user id", 401)
 
     if (!user?.activationToken || user.activationToken.expiresAt < new Date()) {
         throw new ApiError("Activation token not found or expired!", 401)
