@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema<UserInterface>({
     },
     email: {
         type: String,
-        unique: false, // set true on prouction
+        unique: process.env.NODE_ENV === "production", // set true on prouction
         trim: true,
         required: true,
     },

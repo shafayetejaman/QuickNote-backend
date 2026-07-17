@@ -1,15 +1,14 @@
 import { UploadApiResponse } from "cloudinary"
 import crypto from "crypto"
-import fs from "fs"
 import jwt from "jsonwebtoken"
 import { mongo } from "mongoose"
 import { cache } from "../db/db"
+import { Payload } from "../interfaces/customPlayload"
 import { User } from "../models/users.model"
 import ApiError from "../utils/apiError"
 import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
 import imagefileUploder from "../utils/cloudnary"
-import { Payload } from "../interfaces/customPlayload"
 import {
     cookieOptions,
     cookieOptionsWithPath,
@@ -23,23 +22,7 @@ import {
 export const registerUser = asyncHandler(async (req, res) => {
     const data = req.body
 
-    // chacking for missing fields
-    const missingFields = ["username", "fullName", "email", "password"].filter(
-        (field) => !data[field] || typeof field !== "string"
-    )
-
     const profileImagePath = req.files?.profileImage?.[0]?.path || null
-
-    if (missingFields.length > 0) {
-        if (profileImagePath) {
-            fs.unlink(profileImagePath, (error) => {
-                console.log(error)
-            })
-        }
-        throw new ApiError("Missing or invalid fields", 400, null, {
-            missingFields,
-        })
-    }
 
     const { isStrongPassword, isValidEmail } = validateUserData(
         req.body.password,

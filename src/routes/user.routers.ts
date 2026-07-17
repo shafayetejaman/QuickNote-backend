@@ -10,7 +10,7 @@ import {
 import authMiddleware from "../middlewares/auth.middleware"
 import upload from "../middlewares/multer.middleware"
 
-export const router = Router()
+const router = Router()
 
 router.route("/register").post(
     upload.fields([
@@ -37,3 +37,5 @@ router.route("/update-user-data").post(
     authMiddleware,
     updateUser
 )
+
+export default router

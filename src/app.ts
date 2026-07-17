@@ -10,7 +10,7 @@ import ApiRespose from "./utils/apiResponse"
 
 const app = express()
 
-app.get("/", function (req, res) {
+app.get("/", function (_req, res) {
     return new ApiRespose("This is Home").send(res)
 })
 
@@ -25,7 +25,7 @@ app.use(cookieParser())
 app.use(dbMiddleware)
 
 // router import
-import { router as userRouter } from "./routes/user.routers"
+import userRouter from "./routes/user.routers"
 
 // routes
 app.use("/api/v1/users", userRouter)
