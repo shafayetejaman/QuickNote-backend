@@ -75,9 +75,9 @@ userSchema.methods.isPasswordMatch = async function (password: string) {
     return await bycript.compare(password, this.password)
 }
 
-userSchema.methods.ExtractData = function () {
+userSchema.methods.extractData = function () {
     const { password, refreshToken, activationToken, _id, ...userData } =
-        this.user.toObject()
+        this.toObject()
 
     return { id: _id.toString(), ...userData }
 }

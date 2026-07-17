@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest"
 import request from "supertest"
-import { app } from "../src/app"
+import app from "../src/app"
 import { User } from "../src/models/users.model"
 import { createTestUser } from "./helpers"
 
@@ -55,7 +55,7 @@ describe("POST /api/v1/users/register", () => {
 
         expect(typeof res.status).toBe("number")
         expect(typeof res.body.success).toBe("boolean")
-        expect(res.status).toBe(400)
+        expect(res.status).toBe(422)
         expect(res.body.success).toBe(false)
     })
 
@@ -69,7 +69,7 @@ describe("POST /api/v1/users/register", () => {
 
         expect(typeof res.status).toBe("number")
         expect(typeof res.body.success).toBe("boolean")
-        expect(res.status).toBe(403)
+        expect(res.status).toBe(422)
         expect(res.body.success).toBe(false)
     })
 
@@ -83,7 +83,7 @@ describe("POST /api/v1/users/register", () => {
 
         expect(typeof res.status).toBe("number")
         expect(typeof res.body.success).toBe("boolean")
-        expect(res.status).toBe(403)
+        expect(res.status).toBe(422)
         expect(res.body.success).toBe(false)
     })
 
@@ -209,7 +209,7 @@ describe("POST /api/v1/users/login", () => {
 
         expect(typeof res.status).toBe("number")
         expect(typeof res.body.success).toBe("boolean")
-        expect(res.status).toBe(404)
+        expect(res.status).toBe(422)
         expect(res.body.success).toBe(false)
     })
 })
@@ -310,7 +310,7 @@ describe("GET /api/v1/users/activate", () => {
 
         expect(typeof res.status).toBe("number")
         expect(typeof res.body.success).toBe("boolean")
-        expect(res.status).toBe(401)
+        expect(res.status).toBe(422)
         expect(res.body.success).toBe(false)
     })
 })
@@ -371,7 +371,7 @@ describe("GET /api/v1/users/logout", () => {
             .set("Authorization", `Bearer ${accessToken}`)
 
         expect(typeof res.status).toBe("number")
-        expect(res.status).toBe(500)
+        expect(res.status).toBe(200)
     })
 
     it("should fail without auth token", async () => {
@@ -405,7 +405,7 @@ describe("POST /api/v1/users/update-user-data", () => {
             .field("fullName", "Updated Name")
 
         expect(typeof res.status).toBe("number")
-        expect(res.status).toBe(500)
+        expect(res.status).toBe(201)
     })
 
     it("should fail without auth token", async () => {

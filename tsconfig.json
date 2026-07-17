@@ -19,9 +19,7 @@
         "useUnknownInCatchVariables": true
     },
     "include": [
-        "src/**/*.ts",
-        "test/**/*.ts",
-        "src/templates/activationEmail.html"
+        "src/**/*.ts"
     ],
     "exclude": [
         "node_modules",

@@ -7,7 +7,7 @@
         "start": "nodemon",
         "format": "prettier --write .",
         "log": "ts-node ./src/utils/printLog",
-        "build": "tsc && mkdir -p dist/templates && cp src/templates/* dist/templates/",
+        "build": "npm run test && tsc && mkdir -p dist/templates && cp src/templates/* dist/templates/",
         "test": "vitest run",
         "test:watch": "vitest"
     },

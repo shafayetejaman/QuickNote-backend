@@ -35,7 +35,7 @@ export function loginUserQueryValidator() {
     return [
         commonBodyValidation("username").isString(),
 
-        commonBodyValidation("password").isStrongPassword(),
+        commonBodyValidation("password").isString(),
     ]
 }
 

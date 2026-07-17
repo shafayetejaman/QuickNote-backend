@@ -1,27 +1,30 @@
+import mongoose from "mongoose"
 import { NextFunction, Request, Response } from "express"
 import { dbConnect } from "../db/db"
 import ApiError from "../utils/apiError"
-
-// global db connection
-let dbPromise: Promise<void> | null = null
+import { DB_CONNECTION_TIMEOUT } from "../constants"
 
 export default async function dbMiddleware(
     _req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction
 ): Promise<void> {
-    // lazyload db connection
-    if (!dbPromise) {
-        dbPromise = dbConnect().catch((err) => {
-            console.error("DB connection failed:", err)
-            dbPromise = null
-        })
+    if (mongoose.connection.readyState === 1) {
+        return next()
     }
 
     try {
-        await dbPromise
+        await Promise.race([
+            dbConnect(),
+            new Promise((_, reject) =>
+                setTimeout(
+                    () => reject(new Error("Connection timeout")),
+                    DB_CONNECTION_TIMEOUT
+                )
+            ),
+        ])
+        next()
     } catch (error) {
         throw new ApiError("Database unavailable", 503, error)
     }
-    next()
 }

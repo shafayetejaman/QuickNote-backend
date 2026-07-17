@@ -13,3 +13,5 @@ export default {
     LIMIT: "16KB",
     PUBLIC_IMAGE_PATH: "public/temp/",
 }
+
+export const DB_CONNECTION_TIMEOUT = 5_000
