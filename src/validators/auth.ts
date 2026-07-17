@@ -12,6 +12,13 @@ export function registerUserQueryValidator() {
         commonBodyValidation("email").isString(),
 
         commonBodyValidation("fullName").isString(),
+        commonBodyValidation("password").isString().isStrongPassword({
+            minLength: 8,
+            minLowercase: 1,
+            minUppercase: 0,
+            minNumbers: 1,
+            minSymbols: 0,
+        }),
 
         body("profileImageUrl")
             .optional()
