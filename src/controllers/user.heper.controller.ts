@@ -1,6 +1,4 @@
 import crypto from "crypto"
-import invalidDomian from "disposable-email-domains"
-import validator from "validator"
 import { User } from "../models/users.model"
 import ApiError from "../utils/apiError"
 import EmailService from "../utils/sendMail"
@@ -16,30 +14,6 @@ export const cookieOptionsWithPath = {
     path: "/api/v1/users/get-refresh-token",
 }
 
-export function validateUserData(
-    password: string | null = null,
-    email: string | null = null
-) {
-    let isStrongPassword: boolean | null = null
-    let isValidEmail: boolean | null = null
-
-    if (password) {
-        isStrongPassword = validator.isStrongPassword(password, {
-            minLength: 8,
-            minLowercase: 1,
-            minUppercase: 0,
-            minNumbers: 1,
-            minSymbols: 0,
-        })
-    }
-    if (email) {
-        isValidEmail =
-            validator.isEmail(email) &&
-            !invalidDomian.includes(email.split("@")[1])
-    }
-
-    return { isStrongPassword, isValidEmail }
-}
 export async function setAccessAndRefereshToken(
     user: InstanceType<typeof User>
 ) {

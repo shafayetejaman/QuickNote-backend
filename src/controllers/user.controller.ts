@@ -16,29 +16,12 @@ import {
     getUser,
     sendEmailWithActivationToken,
     setAccessAndRefereshToken,
-    validateUserData,
 } from "./user.heper.controller"
 
 export const registerUser = asyncHandler(async (req, res) => {
     const data = req.body
 
     const profileImagePath = req.files?.profileImage?.[0]?.path || null
-
-    const { isStrongPassword, isValidEmail } = validateUserData(
-        req.body.password,
-        req.body.email
-    )
-
-    if (!isStrongPassword) {
-        throw new ApiError(
-            `Password must contain at least 8 characters, ` +
-                `including 1 letter, ` +
-                `and 1 number`,
-            403
-        )
-    }
-
-    if (!isValidEmail) throw new ApiError("Invalid Email!", 403)
     const user = new User(data)
 
     let cloudinaryRespose: UploadApiResponse | null = null
