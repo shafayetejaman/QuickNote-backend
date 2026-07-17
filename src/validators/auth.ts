@@ -1,5 +1,4 @@
 import invalidDomian from "disposable-email-domains"
-import { body } from "express-validator"
 import { commonBodyValidation } from "./validate"
 
 export function registerUserQueryValidator() {
@@ -15,6 +14,7 @@ export function registerUserQueryValidator() {
         }),
 
         commonBodyValidation("fullName").isString(),
+
         commonBodyValidation("password")
             .isStrongPassword({
                 minLength: 8,
@@ -28,11 +28,13 @@ export function registerUserQueryValidator() {
                     "including 1 letter, " +
                     "and 1 number"
             ),
+    ]
+}
 
-        body("profileImageUrl")
-            .optional()
-            .isURL()
-            .withMessage("Should be URL")
-            .escape(),
+export function loginUserQueryValidator() {
+    return [
+        commonBodyValidation("username").isString(),
+
+        commonBodyValidation("password").isStrongPassword(),
     ]
 }

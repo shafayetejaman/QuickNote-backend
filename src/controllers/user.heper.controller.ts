@@ -60,7 +60,7 @@ export function extractUserData(user: InstanceType<typeof User>) {
 
 export async function getUser(
     username: string
-): Promise<InstanceType<typeof User> | null> {
+): InstanceType<typeof User | null> {
     let user = null
     try {
         user = await User.findOne({ username })

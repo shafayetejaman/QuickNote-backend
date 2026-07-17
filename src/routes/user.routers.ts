@@ -9,6 +9,11 @@ import {
 } from "../controllers/user.controller"
 import authMiddleware from "../middlewares/auth.middleware"
 import upload from "../middlewares/multer.middleware"
+import {
+    loginUserQueryValidator,
+    registerUserQueryValidator,
+} from "../validators/auth"
+import { validate } from "../validators/validate"
 
 const router = Router()
 
@@ -19,9 +24,11 @@ router.route("/register").post(
             maxCount: 1,
         },
     ]),
+    registerUserQueryValidator(),
+    validate,
     registerUser
 )
-router.route("/login").post(loginUser)
+router.route("/login").post(loginUserQueryValidator(), validate, loginUser)
 router.route("/activate").get(activateUser)
 router.route("/get-refresh-token").get(getRefreshToken)
 

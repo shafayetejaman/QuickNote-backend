@@ -56,10 +56,6 @@ export const registerUser = asyncHandler(async (req, res) => {
 export const loginUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body
 
-    if (typeof username !== "string" || typeof password !== "string") {
-        throw new ApiError("username or password is invalid!", 404)
-    }
-
     const user = await getUser(username)
 
     if (!user || !(await user?.isPasswordMatch(password))) {
@@ -160,33 +156,15 @@ export const updateUser = asyncHandler(async (req, res) => {
         if (password !== confPassword) {
             throw new ApiError("Password did not match!", 403)
         }
-
-        const { isStrongPassword } = validateUserData(password)
-
-        if (!isStrongPassword) {
-            throw new ApiError(
-                `Password must contain at least 8 characters,` +
-                    `including 1 uppercase letter, ` +
-                    `1 lowercase letter, and 1 number`,
-                403
-            )
-        }
-
         user.password = password
-        await user.validate(["password"])
     }
 
     if (email) {
-        const { isValidEmail } = validateUserData(null, email)
-        if (!isValidEmail) throw new ApiError("Invalid Email!", 403)
-
         user.email = email
-        await user.validate(["email"])
     }
 
     if (fullName) {
         user.fullName = fullName
-        await user.validate(["fullName"])
     }
 
     // uploading img to cloud
@@ -201,7 +179,7 @@ export const updateUser = asyncHandler(async (req, res) => {
 
     // validating the given data
     try {
-        await user.save({ validateBeforeSave: false }) // update user
+        await user.save()
     } catch (error) {
         if (error instanceof mongo.MongoServerError && error.code === 11000) {
             throw new ApiError("Dublicate Email", 409, error)
@@ -243,9 +221,5 @@ export const activateUser = asyncHandler(async (req, res) => {
 
     await user.save()
 
-    // const statusCode = 200
-    // res.status(statusCode).json(
-    //     new ApiRespose(statusCode, "user activated successfully")
-    // )
     return res.redirect(`${process.env.FRONTEND_URL}/login`)
 })

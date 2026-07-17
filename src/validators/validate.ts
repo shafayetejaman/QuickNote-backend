@@ -1,8 +1,8 @@
-import { NextFunction } from "express"
+import { RequestHandler } from "express"
 import { body, validationResult } from "express-validator"
 import ApiError from "../utils/apiError"
 
-export function validate(req: Request, _res: Response, next: NextFunction) {
+export const validate: RequestHandler = (req, _res, next) => {
     const result = validationResult(req)
     if (result.isEmpty()) {
         return next()
