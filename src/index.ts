@@ -4,19 +4,16 @@ dotenv.config({ path: "./.env" })
 import app from "./app"
 import { dbConnect } from "./db/db"
 
-dbConnect()
-    .then(() => {
-        console.log("Database connected successfully.")
-    })
-    .catch((error) => {
-        console.error("Database connection error: ", error)
-        if (process.env.NODE_ENV !== "production") {
-            process.exit(-1)
-        }
-    })
-
-//only run app.listen if we are in a local environment
+//only run if we are in a local environment
 if (process.env.NODE_ENV !== "production") {
+    dbConnect()
+        .then(() => {
+            console.log("Database connected successfully.")
+        })
+        .catch((error) => {
+            console.error("Database connection error: ", error)
+            process.exit(-1)
+        })
     const PORT: number = parseInt(process.env.PORT as string) || 8000
     const server = app.listen(PORT, (): void => {
         const addressInfo = server.address()

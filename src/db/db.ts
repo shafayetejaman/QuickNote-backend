@@ -8,4 +8,4 @@ export async function dbConnect() {
     console.log("DB connect to ", dbConnection.connection.host)
 }
 
-export const cache = new createClient()
+export const dbClient = new createClient()
