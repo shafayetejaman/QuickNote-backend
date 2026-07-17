@@ -6,7 +6,7 @@ import constants from "./constants"
 import { errorHandler } from "./middlewares/errorHandeler.middleware"
 import { formatter } from "./middlewares/logger.middleware"
 
-export const app = express()
+const app = express()
 
 // middle wares
 app.use(compression({ threshold: 0 }))
@@ -25,3 +25,5 @@ app.use("/api/v1/users", userRouter)
 
 // error middleware for sending error respose to user
 app.use(errorHandler)
+
+export default app
