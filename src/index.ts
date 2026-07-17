@@ -4,6 +4,10 @@ dotenv.config({ path: "./.env" })
 import app from "./app"
 import { dbConnect } from "./db/db"
 
+app.get("/", function (req, res) {
+    res.status(200).json({ status: "success", message: "This is Home Backend" })
+})
+
 dbConnect()
     .then(() => {
         console.log("Database connected successfully.")
@@ -14,10 +18,6 @@ dbConnect()
             process.exit(-1)
         }
     })
-
-app.get("/", function (req, res) {
-    res.status(200).json({ status: "success", message: "This is Home Backend" })
-})
 
 //only run app.listen if we are in a local environment
 if (process.env.NODE_ENV !== "production") {
