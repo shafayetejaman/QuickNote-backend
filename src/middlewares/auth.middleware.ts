@@ -6,12 +6,11 @@ import asyncHandler from "../utils/asyncHandeler"
 import { Payload } from "../interfaces/customPlayload"
 
 export default asyncHandler(async (req, res, next) => {
-    const statusCode = 401
     const accessToken =
         req.cookies.accessToken ||
         req.header("Authorization")?.replace("Bearer ", "")
 
-    if (!accessToken) throw new ApiError("Access Token required!", statusCode)
+    if (!accessToken) throw new ApiError("Access Token required!", 401)
 
     let payload
     try {
@@ -25,7 +24,7 @@ export default asyncHandler(async (req, res, next) => {
             "refreshToken",
             COOKIE_OPTIONS_WITH_PATH
         )
-        return new ApiRespose("Access Token Invalid!", statusCode).send(res)
+        return new ApiRespose("Access Token Invalid!", 401).send(res)
     }
     req.user = payload as Payload
 
