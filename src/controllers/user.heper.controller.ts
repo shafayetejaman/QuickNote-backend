@@ -3,17 +3,6 @@ import { User } from "../models/users.model"
 import ApiError from "../utils/apiError"
 import EmailService from "../utils/sendMail"
 
-export const cookieOptions = {
-    // Use security feature only in production
-    httpOnly: process.env.NODE_ENV === "production",
-    secure: process.env.NODE_ENV === "production",
-}
-
-export const cookieOptionsWithPath = {
-    ...cookieOptions,
-    path: "/api/v1/users/get-refresh-token",
-}
-
 export async function setAccessAndRefereshToken(
     user: InstanceType<typeof User>
 ) {
@@ -49,24 +38,4 @@ export async function sendEmailWithActivationToken(
 
     const info = await EmailService.send(user, token)
     console.log("Emailservice Respose: ", info)
-}
-
-export function extractUserData(user: InstanceType<typeof User>) {
-    const { password, refreshToken, activationToken, _id, ...userData } =
-        user.toObject()
-
-    return { id: _id.toString(), ...userData }
-}
-
-export async function getUser(
-    username: string
-): InstanceType<typeof User | null> {
-    let user = null
-    try {
-        user = await User.findOne({ username })
-    } catch (error) {
-        console.error(error)
-    }
-
-    return user
 }

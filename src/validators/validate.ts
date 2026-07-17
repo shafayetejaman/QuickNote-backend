@@ -1,5 +1,5 @@
 import { RequestHandler } from "express"
-import { body, validationResult } from "express-validator"
+import { body, query, validationResult } from "express-validator"
 import ApiError from "../utils/apiError"
 
 export const validate: RequestHandler = (req, _res, next) => {
@@ -23,7 +23,20 @@ export function commonBodyValidation(
         .exists()
         .withMessage(`${name} not given!`)
         .trim()
-        .isEmpty()
+        .notEmpty()
+        .withMessage(`${name} is empty!`)
+        .escape()
+}
+
+export function commonQueryValidation(
+    name: string,
+    baseMessage = `Invalid ${name}!`
+) {
+    return query(name, baseMessage)
+        .exists()
+        .withMessage(`${name} not given!`)
+        .trim()
+        .notEmpty()
         .withMessage(`${name} is empty!`)
         .escape()
 }

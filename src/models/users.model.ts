@@ -20,6 +20,7 @@ interface UserInterface {
         token: string
         expiresAt: Date
     }>
+    extractData: () => Object
 }
 
 const userSchema = new mongoose.Schema<UserInterface>({
@@ -73,6 +74,14 @@ userSchema.pre("save", async function () {
 userSchema.methods.isPasswordMatch = async function (password: string) {
     return await bycript.compare(password, this.password)
 }
+
+userSchema.methods.ExtractData = function () {
+    const { password, refreshToken, activationToken, _id, ...userData } =
+        this.user.toObject()
+
+    return { id: _id.toString(), ...userData }
+}
+
 userSchema.methods.generateAccessToken = async function () {
     return jwt.sign(
         {

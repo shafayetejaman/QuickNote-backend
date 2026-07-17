@@ -10,8 +10,10 @@ import {
 import authMiddleware from "../middlewares/auth.middleware"
 import upload from "../middlewares/multer.middleware"
 import {
+    activateUserQueryValidator,
     loginUserQueryValidator,
     registerUserQueryValidator,
+    updateUserQueryValidator,
 } from "../validators/auth"
 import { validate } from "../validators/validate"
 
@@ -29,7 +31,7 @@ router.route("/register").post(
     registerUser
 )
 router.route("/login").post(loginUserQueryValidator(), validate, loginUser)
-router.route("/activate").get(activateUser)
+router.route("/activate").get(activateUserQueryValidator(), validate, activateUser)
 router.route("/get-refresh-token").get(getRefreshToken)
 
 // secure routhes
@@ -42,6 +44,8 @@ router.route("/update-user-data").post(
         },
     ]),
     authMiddleware,
+    updateUserQueryValidator(),
+    validate,
     updateUser
 )
 

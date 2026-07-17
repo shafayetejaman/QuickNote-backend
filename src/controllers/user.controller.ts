@@ -10,13 +10,10 @@ import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
 import imagefileUploder from "../utils/cloudnary"
 import {
-    cookieOptions,
-    cookieOptionsWithPath,
-    extractUserData,
-    getUser,
     sendEmailWithActivationToken,
     setAccessAndRefereshToken,
 } from "./user.heper.controller"
+import { COOKIE_OPTIONS, COOKIE_OPTIONS_WITH_PATH } from "../constants"
 
 export const registerUser = asyncHandler(async (req, res) => {
     const data = req.body
@@ -49,14 +46,14 @@ export const registerUser = asyncHandler(async (req, res) => {
     return new ApiRespose(
         "User created Successfully!",
         201,
-        extractUserData(user)
+        user.extractData()
     ).send(res)
 })
 
 export const loginUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body
 
-    const user = await getUser(username)
+    const user = await User.findOne({ username })
 
     if (!user || !(await user?.isPasswordMatch(password))) {
         throw new ApiError("username or password is incorrect!", 404)
@@ -74,23 +71,23 @@ export const loginUser = asyncHandler(async (req, res) => {
     cache.set(username, user)
 
     const statusCode = 202
-    res.cookie("accessToken", accessToken, cookieOptions).cookie(
+    res.cookie("accessToken", accessToken, COOKIE_OPTIONS).cookie(
         "refreshToken",
         refreshToken,
-        cookieOptionsWithPath
+        COOKIE_OPTIONS_WITH_PATH
     )
 
     return new ApiRespose("user logged in!", statusCode, {
         accessToken,
         refreshToken,
-        user: extractUserData(user),
+        user: user.extractData(),
     }).send(res)
 })
 
 export const logoutUser = asyncHandler(async (req, res) => {
     if (!req.user) throw new ApiError()
 
-    const user = await getUser(req.user.username)
+    const user = await User.findOne({ username: req.user.username })
     if (!user) throw new ApiError("Unable to find user", 500)
 
     cache.del(req.user.username)
@@ -98,9 +95,9 @@ export const logoutUser = asyncHandler(async (req, res) => {
 
     await user.save()
 
-    res.clearCookie("accessToken", cookieOptions).clearCookie(
+    res.clearCookie("accessToken", COOKIE_OPTIONS).clearCookie(
         "refreshToken",
-        cookieOptionsWithPath
+        COOKIE_OPTIONS_WITH_PATH
     )
 
     return new ApiRespose("user logged out!").send(res)
@@ -123,7 +120,7 @@ export const getRefreshToken = asyncHandler(async (req, res) => {
         throw new ApiError("Refresh token invalid!", 403, error)
     }
 
-    const user = await getUser(payload?.username)
+    const user = await User.findOne({ username: payload?.username })
     if (!user) throw new ApiError("Refresh token invalid!", 403)
 
     const { accessToken, refreshToken } = await setAccessAndRefereshToken(user)
@@ -131,10 +128,10 @@ export const getRefreshToken = asyncHandler(async (req, res) => {
     cache.set(user.username, user)
 
     const statusCodoe = 202
-    res.cookie("accessToken", accessToken, cookieOptions).cookie(
+    res.cookie("accessToken", accessToken, COOKIE_OPTIONS).cookie(
         "refreshToken",
         refreshToken,
-        cookieOptionsWithPath
+        COOKIE_OPTIONS_WITH_PATH
     )
 
     return new ApiRespose("User Token refreshed!", statusCodoe, {
@@ -146,16 +143,13 @@ export const getRefreshToken = asyncHandler(async (req, res) => {
 export const updateUser = asyncHandler(async (req, res) => {
     if (!req.user) throw new ApiError()
 
-    const user = await getUser(req.user.username)
+    const user = await User.findOne({ username: req.user.username })
     if (!user) throw new ApiError("Unable to find user", 500)
 
     const { fullName, email, password, confPassword } = req.body
     const profileImagePath = req.files?.profileImage?.[0]?.path
 
     if (password && confPassword) {
-        if (password !== confPassword) {
-            throw new ApiError("Password did not match!", 403)
-        }
         user.password = password
     }
 
@@ -191,15 +185,11 @@ export const updateUser = asyncHandler(async (req, res) => {
     return new ApiRespose(
         "User Updated Successfully!",
         201,
-        extractUserData(user)
+        user.extractData()
     ).send(res)
 })
 
 export const activateUser = asyncHandler(async (req, res) => {
-    if (!(req.query.userId && req.query.token)) {
-        throw new ApiError("Activation token and user ID required", 401)
-    }
-
     const user = await User.findById(req.query.userId)
     if (!user) throw new ApiError("invalid user id", 401)
 

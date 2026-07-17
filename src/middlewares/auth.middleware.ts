@@ -1,8 +1,5 @@
 import jwt from "jsonwebtoken"
-import {
-    cookieOptions,
-    cookieOptionsWithPath,
-} from "../controllers/user.heper.controller"
+import { COOKIE_OPTIONS, COOKIE_OPTIONS_WITH_PATH } from "../constants"
 import ApiError from "../utils/apiError"
 import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
@@ -24,9 +21,9 @@ export default asyncHandler(async (req, res, next) => {
         )
     } catch (error) {
         console.error(error)
-        res.clearCookie("accessToken", cookieOptions).clearCookie(
+        res.clearCookie("accessToken", COOKIE_OPTIONS).clearCookie(
             "refreshToken",
-            cookieOptionsWithPath
+            COOKIE_OPTIONS_WITH_PATH
         )
         return new ApiRespose("Access Token Invalid!", statusCode).send(res)
     }
