@@ -20,9 +20,16 @@ app.use(express.json({ limit: constants.LIMIT }))
 app.use(express.static("public"))
 app.use(express.urlencoded({ extended: true, limit: constants.LIMIT }))
 app.use(formatter)
-app.use(cors({ origin: process.env.ORIGIN, credentials: true }))
 app.use(cookieParser())
 app.use(dbMiddleware)
+app.use(
+    cors({
+        origin: process.env.BACKEND_URL,
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+        credentials: true, // allow cookies
+    })
+)
 
 // router import
 import userRouter from "./routes/user.routers"
