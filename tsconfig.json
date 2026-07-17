@@ -20,6 +20,7 @@
     },
     "include": [
         "src/**/*.ts",
+        "test/**/*.ts",
         "src/templates/activationEmail.html"
     ],
     "exclude": [
