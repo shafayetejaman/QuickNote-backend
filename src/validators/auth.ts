@@ -1,21 +1,21 @@
 import invalidDomian from "disposable-email-domains"
-import { commonBodyValidation, commonQueryValidation } from "./validate"
+import { commonBodyValidator, commonQueryValidator } from "./validate"
 
 export function registerUserQueryValidator() {
     return [
-        commonBodyValidation("username")
+        commonBodyValidator("username")
             .isString()
             .isLength({ min: 2, max: 50 })
             .withMessage("Invalid lenght")
             .matches(/^([a-zA-Z._-]+\d*)+$/),
 
-        commonBodyValidation("email").isEmail({
+        commonBodyValidator("email").isEmail({
             host_blacklist: invalidDomian,
         }),
 
-        commonBodyValidation("fullName").isString(),
+        commonBodyValidator("fullName").isString(),
 
-        commonBodyValidation("password")
+        commonBodyValidator("password")
             .isStrongPassword({
                 minLength: 8,
                 minLowercase: 1,
@@ -33,22 +33,21 @@ export function registerUserQueryValidator() {
 
 export function loginUserQueryValidator() {
     return [
-        commonBodyValidation("username").isString(),
+        commonBodyValidator("username").isString(),
 
-        commonBodyValidation("password").isString(),
+        commonBodyValidator("password").isString(),
     ]
 }
 
 export function updateUserQueryValidator() {
     return [
-        commonBodyValidation("fullName").optional().isString(),
+        commonBodyValidator("fullName", true).isString(),
 
-        commonBodyValidation("email").optional().isEmail({
+        commonBodyValidator("email", true).isEmail({
             host_blacklist: invalidDomian,
         }),
 
-        commonBodyValidation("password")
-            .optional()
+        commonBodyValidator("password", true)
             .isStrongPassword({
                 minLength: 8,
                 minLowercase: 1,
@@ -62,8 +61,7 @@ export function updateUserQueryValidator() {
                     "and 1 number"
             ),
 
-        commonBodyValidation("confPassword")
-            .optional()
+        commonBodyValidator("confPassword", true)
             .isString()
             .custom((value, { req }) => {
                 if (value !== req.body.password) {
@@ -76,10 +74,10 @@ export function updateUserQueryValidator() {
 
 export function activateUserQueryValidator() {
     return [
-        commonQueryValidation("userId")
+        commonQueryValidator("userId")
             .isMongoId()
             .withMessage("Invalid user ID!"),
 
-        commonQueryValidation("token").isString().isLength({ min: 10 }),
+        commonQueryValidator("token").isString().isLength({ min: 10 }),
     ]
 }

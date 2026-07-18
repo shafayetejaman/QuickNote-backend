@@ -15,28 +15,32 @@ export const validate: RequestHandler = (req, _res, next) => {
     throw new ApiError("Invalid data given!", 422, null, errors)
 }
 
-export function commonBodyValidation(
+export function commonBodyValidator(
     name: string,
+    optional = false,
     baseMessage = `Invalid ${name}!`
 ) {
-    return body(name, baseMessage)
-        .exists()
-        .withMessage(`${name} not given!`)
-        .trim()
-        .notEmpty()
-        .withMessage(`${name} is empty!`)
-        .escape()
+    let Body
+    if (optional) Body = body(name, baseMessage).optional()
+    else
+        Body = body(name, baseMessage)
+            .exists()
+            .withMessage(`${name} not given!`)
+
+    return Body.trim().notEmpty().withMessage(`${name} is empty!`).escape()
 }
 
-export function commonQueryValidation(
+export function commonQueryValidator(
     name: string,
-    baseMessage = `Invalid ${name}!`
+    optional = false,
+    baseMessage = `Invalid param ${name}!`
 ) {
-    return query(name, baseMessage)
-        .exists()
-        .withMessage(`${name} not given!`)
-        .trim()
-        .notEmpty()
-        .withMessage(`${name} is empty!`)
-        .escape()
+    let Query
+    if (optional) Query = query(name, baseMessage).optional()
+    else
+        Query = query(name, baseMessage)
+            .exists()
+            .withMessage(`${name} not given!`)
+
+    return Query.trim().notEmpty().withMessage(`${name} is empty!`).escape()
 }
