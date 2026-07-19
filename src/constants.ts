@@ -15,3 +15,5 @@ export default {
 }
 
 export const DB_CONNECTION_TIMEOUT = 5_000
+
+export const MONGODB_URI = `${process.env.MON_URI}/${process.env.DB_NAME}`

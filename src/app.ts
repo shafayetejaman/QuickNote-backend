@@ -3,10 +3,12 @@ import cookieParser from "cookie-parser"
 import cors from "cors"
 import express from "express"
 import constants from "./constants"
-import dbMiddleware from "./middlewares/db.middleware"
 import { errorHandler } from "./middlewares/errorHandeler.middleware"
 import { formatter } from "./middlewares/logger.middleware"
 import ApiRespose from "./utils/apiResponse"
+import { dbConnect } from "./db/db"
+// router import
+import userRouter from "./routes/user.routers"
 
 const app = express()
 
@@ -21,7 +23,6 @@ app.use(express.static("public"))
 app.use(express.urlencoded({ extended: true, limit: constants.LIMIT }))
 app.use(formatter)
 app.use(cookieParser())
-app.use(dbMiddleware)
 app.use(
     cors({
         origin: process.env.FRONTEND_URL,
@@ -30,9 +31,15 @@ app.use(
         credentials: true, // allow cookies
     })
 )
-
-// router import
-import userRouter from "./routes/user.routers"
+// global interceptor middleware runs on Production
+app.use(async (_req, _res, next) => {
+    try {
+        await dbConnect()
+        next()
+    } catch (error) {
+        next(error)
+    }
+})
 
 // routes
 app.use("/api/v1/users", userRouter)

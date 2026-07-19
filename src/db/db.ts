@@ -1,11 +1,55 @@
 import mongoose from "mongoose"
-import createClient from "node-cache"
+import NodeCache from "node-cache"
+import { MONGODB_URI } from "../constants"
 
-export async function dbConnect() {
-    const dbConnection = await mongoose.connect(
-        `${process.env.MON_URI}/${process.env.DB_NAME}`
-    )
-    console.log("DB connect to ", dbConnection.connection.host)
+// 1. Make the global property explicitly required once initialized
+declare global {
+    var mongooseConnection:
+        | {
+              conn: typeof mongoose | null
+              promise: Promise<typeof mongoose> | null
+          }
+        | undefined
 }
 
-export const cache = new createClient()
+// 2. Initialize the global container first if it doesn't exist
+if (!globalThis.mongooseConnection) {
+    globalThis.mongooseConnection = { conn: null, promise: null }
+}
+
+// 3. Point to the guaranteed global object
+const cached = globalThis.mongooseConnection
+
+export async function dbConnect(): Promise<typeof mongoose> {
+    if (cached.conn) {
+        return cached.conn
+    }
+
+    if (!cached.promise) {
+        const opts = {
+            bufferCommands: false,
+            maxPoolSize: 10,
+        }
+
+        cached.promise = mongoose
+            .connect(MONGODB_URI, opts)
+            .then((mongooseInstance) => {
+                console.log(
+                    "DB connected to:",
+                    mongooseInstance.connection.host
+                )
+                return mongooseInstance
+            })
+    }
+
+    try {
+        cached.conn = await cached.promise
+    } catch (e) {
+        cached.promise = null
+        throw e
+    }
+
+    return cached.conn
+}
+
+export const cache = new NodeCache()
