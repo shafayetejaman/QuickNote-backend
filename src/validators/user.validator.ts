@@ -1,5 +1,5 @@
 import invalidDomian from "disposable-email-domains"
-import { commonBodyValidator, commonQueryValidator } from "./validate"
+import { commonBodyValidator, commonQueryValidator } from "./commonValidator"
 
 export function registerUserQueryValidator() {
     return [

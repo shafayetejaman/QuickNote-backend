@@ -4,7 +4,7 @@ import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
 
 export const getAllNotes = asyncHandler(async (req) => {
-    const notes = await Note.find({ user: req.user.id })
+    const notes = await Note.find({ user: req.user?.id })
     if (!notes) throw new ApiError("User not found")
 
     return new ApiRespose("Notes of the user", 200, notes)
