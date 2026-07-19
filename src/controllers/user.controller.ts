@@ -2,9 +2,11 @@ import { UploadApiResponse } from "cloudinary"
 import crypto from "crypto"
 import jwt from "jsonwebtoken"
 import { mongo } from "mongoose"
-import { cache } from "../db/db"
+import { userCache } from "../db/db"
 import { Payload } from "../interfaces/customPlayload"
 import { User } from "../models/users.model"
+
+type UserDoc = InstanceType<typeof User>
 import ApiError from "../utils/apiError"
 import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
@@ -68,7 +70,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 
     const { accessToken, refreshToken } = await setAccessAndRefereshToken(user)
 
-    cache.set(username, user)
+    userCache.set(user.id, user)
 
     const statusCode = 202
     res.cookie("accessToken", accessToken, COOKIE_OPTIONS).cookie(
@@ -87,10 +89,10 @@ export const loginUser = asyncHandler(async (req, res) => {
 export const logoutUser = asyncHandler(async (req, res) => {
     if (!req.user) throw new ApiError()
 
-    const user = await User.findOne({ username: req.user.username })
+    const user = (userCache.get(req.user.id) as UserDoc) || (await User.findById(req.user.id))
     if (!user) throw new ApiError("Unable to find user", 500)
 
-    cache.del(req.user.username)
+    userCache.del(req.user.id)
     user.refreshToken = undefined
 
     await user.save()
@@ -120,12 +122,12 @@ export const getRefreshToken = asyncHandler(async (req, res) => {
         throw new ApiError("Refresh token invalid!", 403, error)
     }
 
-    const user = await User.findOne({ username: payload?.username })
+    const user = (userCache.get(payload.id) as UserDoc) || (await User.findById(payload.id))
     if (!user) throw new ApiError("Refresh token invalid!", 403)
 
     const { accessToken, refreshToken } = await setAccessAndRefereshToken(user)
 
-    cache.set(user.username, user)
+    userCache.set(user.id, user)
 
     const statusCodoe = 202
     res.cookie("accessToken", accessToken, COOKIE_OPTIONS).cookie(
@@ -143,7 +145,7 @@ export const getRefreshToken = asyncHandler(async (req, res) => {
 export const updateUser = asyncHandler(async (req, res) => {
     if (!req.user) throw new ApiError()
 
-    const user = await User.findOne({ username: req.user.username })
+    const user = (userCache.get(req.user.id) as UserDoc) || (await User.findById(req.user.id))
     if (!user) throw new ApiError("Unable to find user", 500)
 
     const { fullName, email, password, confPassword } = req.body
@@ -181,6 +183,9 @@ export const updateUser = asyncHandler(async (req, res) => {
 
         throw new ApiError("Unable to update the user profile!", 400, error)
     }
+
+    userCache.set(user.id, user)
+
     // sending successfull
     return new ApiRespose(
         "User Updated Successfully!",

@@ -4,7 +4,7 @@ import noteRouter from "./notes.router"
 
 const router = Router()
 
-router.use("users/", userRouter)
-router.use("notes/", noteRouter)
+router.use("/v1/users", userRouter)
+router.use("/v1/notes", noteRouter)
 
 export default router

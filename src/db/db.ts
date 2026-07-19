@@ -56,4 +56,4 @@ export async function dbConnect(): Promise<typeof mongoose> {
     return cached.conn
 }
 
-export const cache = new NodeCache()
+export const userCache = new NodeCache()

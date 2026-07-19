@@ -85,7 +85,7 @@ userSchema.methods.extractData = function () {
 userSchema.methods.generateAccessToken = async function () {
     return jwt.sign(
         {
-            _id: this._id,
+            id: this._id,
             username: this.username,
             timeStamp: Date.now(),
             lastOnline: Date.now(),
@@ -101,7 +101,7 @@ userSchema.methods.generateAccessToken = async function () {
 userSchema.methods.generateRefreshToken = async function () {
     return jwt.sign(
         {
-            _id: this._id,
+            id: this._id,
         },
         process.env.JWT_REFRESH_TOKEN as string,
         {

@@ -316,7 +316,7 @@ describe("GET /api/v1/users/activate", () => {
 })
 
 describe("GET /api/v1/users/get-refresh-token", () => {
-    it("should redirect because refresh token JWT lacks username field", async () => {
+    it("should succeed because refresh token JWT contains id field", async () => {
         await createTestUser({
             username: "refreshtest",
             email: "refresh@example.com",
@@ -333,7 +333,7 @@ describe("GET /api/v1/users/get-refresh-token", () => {
             .set("Cookie", [`refreshToken=${refreshToken}`])
 
         expect(typeof res.status).toBe("number")
-        expect(res.status).toBe(403)
+        expect(res.status).toBe(202)
     })
 
     it("should redirect without refresh token", async () => {
