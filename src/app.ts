@@ -7,8 +7,7 @@ import { errorHandler } from "./middlewares/errorHandeler.middleware"
 import { formatter } from "./middlewares/logger.middleware"
 import ApiRespose from "./utils/apiResponse"
 import { dbConnect } from "./db/db"
-// router import
-import userRouter from "./routes/user.routers"
+import router from "./routes/index"
 
 const app = express()
 
@@ -23,6 +22,7 @@ app.use(express.static("public"))
 app.use(express.urlencoded({ extended: true, limit: constants.LIMIT }))
 app.use(formatter)
 app.use(cookieParser())
+app.use("/api", router)
 app.use(
     cors({
         origin: process.env.FRONTEND_URL,
@@ -40,9 +40,6 @@ app.use(async (_req, _res, next) => {
         next(error)
     }
 })
-
-// routes
-app.use("/api/v1/users", userRouter)
 
 // error middleware for sending error respose to user
 app.use(errorHandler)

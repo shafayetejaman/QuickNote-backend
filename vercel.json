@@ -3,6 +3,9 @@
     "functions": {
         "dist/app.js": {
             "maxDuration": 30
+        },
+        "api/**/*": {
+            "memory": 1024
         }
     },
     "rewrites": [

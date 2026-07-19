@@ -14,7 +14,7 @@ import {
     loginUserQueryValidator,
     registerUserQueryValidator,
     updateUserQueryValidator,
-} from "../validators/auth"
+} from "../validators/user.validator"
 import { validate } from "../validators/validate"
 
 const router = Router()
@@ -31,7 +31,9 @@ router.route("/register").post(
     registerUser
 )
 router.route("/login").post(loginUserQueryValidator(), validate, loginUser)
-router.route("/activate").get(activateUserQueryValidator(), validate, activateUser)
+router
+    .route("/activate")
+    .get(activateUserQueryValidator(), validate, activateUser)
 router.route("/get-refresh-token").get(getRefreshToken)
 
 // secure routhes
