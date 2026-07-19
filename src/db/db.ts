@@ -21,8 +21,12 @@ if (!globalThis.mongooseConnection) {
 const cached = globalThis.mongooseConnection
 
 export async function dbConnect(): Promise<typeof mongoose> {
-    if (cached.conn) {
-        return cached.conn
+    if (
+        process.env.NODE_ENV === "test" &&
+        mongoose.connection.readyState === 1
+    ) {
+        cached.conn = mongoose
+        return mongoose
     }
 
     if (!cached.promise) {
