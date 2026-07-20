@@ -6,6 +6,7 @@ const noteSchema = new mongoose.Schema<NoteInterface>(
         user: {
             type: mongoose.Schema.ObjectId,
             ref: "User",
+            required: true,
         },
         title: {
             type: String,
