@@ -3,25 +3,7 @@ import crypto from "crypto"
 import dayjs from "dayjs"
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose"
-
-interface UserInterface {
-    username: string
-    fullName: string
-    email: string
-    password: string
-    profileImageUrl?: string
-    refreshToken?: string
-    role: "admin" | "inactive" | "deactivated" | "active"
-    activationToken?: { token: string; expiresAt: Date }
-    isPasswordMatch: (password: string) => Promise<boolean>
-    generateAccessToken: () => Promise<string>
-    generateRefreshToken: () => Promise<string>
-    generateActivationToken: () => Promise<{
-        token: string
-        expiresAt: Date
-    }>
-    extractData: () => Object
-}
+import UserInterface from "../interfaces/user.interface"
 
 const userSchema = new mongoose.Schema<UserInterface>({
     username: {
@@ -76,10 +58,17 @@ userSchema.methods.isPasswordMatch = async function (password: string) {
 }
 
 userSchema.methods.extractData = function () {
-    const { password, refreshToken, activationToken, _id, ...userData } =
-        this.toObject()
+    const userData = this.toObject()
 
-    return { id: _id.toString(), ...userData }
+    userData.id = userData._id.toString()
+
+    // delete the fields that can not be returned
+    delete userData._id
+    delete userData.password
+    delete userData.refreshToken
+    delete userData.activationToken
+
+    return userData
 }
 
 userSchema.methods.generateAccessToken = async function () {

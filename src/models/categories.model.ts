@@ -1,9 +1,5 @@
 import mongoose from "mongoose"
-
-interface CategoryInterface {
-    name: string
-    categoryIcon: string
-}
+import CategoryInterface from "../interfaces/category.interface"
 
 const categorySchema = new mongoose.Schema<CategoryInterface>({
     name: {

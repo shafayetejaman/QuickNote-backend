@@ -1,10 +1,5 @@
-import mongoose, { Types } from "mongoose"
-
-interface SubNoteInterface {
-    title: string
-    body: string
-    color: Types.ObjectId
-}
+import mongoose from "mongoose"
+import SubNoteInterface from "../interfaces/subNote.interface"
 
 const subNoteSchema = new mongoose.Schema<SubNoteInterface>(
     {

@@ -1,7 +1,7 @@
 import { Request } from "express"
-import { Payload } from "./customPlayload"
+import { Payload } from "./playload.interface"
 
-export interface CustomRequest extends Request {
+export default interface CustomRequest extends Request {
     user?: Payload
 
     files?: {

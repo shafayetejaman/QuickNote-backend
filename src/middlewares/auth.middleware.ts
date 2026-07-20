@@ -3,7 +3,7 @@ import { COOKIE_OPTIONS, COOKIE_OPTIONS_WITH_PATH } from "../constants"
 import ApiError from "../utils/apiError"
 import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
-import { Payload } from "../interfaces/customPlayload"
+import Payload from "../interfaces/playload.interface"
 
 export default asyncHandler(async (req, res, next) => {
     const accessToken =

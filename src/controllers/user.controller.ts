@@ -3,7 +3,7 @@ import crypto from "crypto"
 import jwt from "jsonwebtoken"
 import { mongo } from "mongoose"
 import { userCache } from "../db/db"
-import { Payload } from "../interfaces/customPlayload"
+import Payload from "../interfaces/playload.interface"
 import { User } from "../models/users.model"
 
 type UserDoc = InstanceType<typeof User>
@@ -89,7 +89,9 @@ export const loginUser = asyncHandler(async (req, res) => {
 export const logoutUser = asyncHandler(async (req, res) => {
     if (!req.user) throw new ApiError()
 
-    const user = (userCache.get(req.user.id) as UserDoc) || (await User.findById(req.user.id))
+    const user =
+        (userCache.get(req.user.id) as UserDoc) ||
+        (await User.findById(req.user.id))
     if (!user) throw new ApiError("Unable to find user", 500)
 
     userCache.del(req.user.id)
@@ -122,7 +124,9 @@ export const getRefreshToken = asyncHandler(async (req, res) => {
         throw new ApiError("Refresh token invalid!", 403, error)
     }
 
-    const user = (userCache.get(payload.id) as UserDoc) || (await User.findById(payload.id))
+    const user =
+        (userCache.get(payload.id) as UserDoc) ||
+        (await User.findById(payload.id))
     if (!user) throw new ApiError("Refresh token invalid!", 403)
 
     const { accessToken, refreshToken } = await setAccessAndRefereshToken(user)
@@ -145,7 +149,9 @@ export const getRefreshToken = asyncHandler(async (req, res) => {
 export const updateUser = asyncHandler(async (req, res) => {
     if (!req.user) throw new ApiError()
 
-    const user = (userCache.get(req.user.id) as UserDoc) || (await User.findById(req.user.id))
+    const user =
+        (userCache.get(req.user.id) as UserDoc) ||
+        (await User.findById(req.user.id))
     if (!user) throw new ApiError("Unable to find user", 500)
 
     const { fullName, email, password, confPassword } = req.body
@@ -184,8 +190,6 @@ export const updateUser = asyncHandler(async (req, res) => {
         throw new ApiError("Unable to update the user profile!", 400, error)
     }
 
-    userCache.set(user.id, user)
-
     // sending successfull
     return new ApiRespose(
         "User Updated Successfully!",
@@ -195,7 +199,9 @@ export const updateUser = asyncHandler(async (req, res) => {
 })
 
 export const activateUser = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.query.userId)
+    const userId = req.query.userId as string
+    const user =
+        (userCache.get(userId) as UserDoc) || (await User.findById(userId))
     if (!user) throw new ApiError("invalid user id", 401)
 
     if (!user?.activationToken || user.activationToken.expiresAt < new Date()) {

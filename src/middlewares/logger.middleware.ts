@@ -28,13 +28,7 @@ const logger = createLogger({
 
 const morganFormat: string = ":method :url :status :response-time"
 
-// Custom stream type
-interface LogObject {
-    method: string
-    url: string
-    status: string
-    responseTime: string
-}
+import LogObject from "../interfaces/log.interface"
 
 export const formatter = morgan(morganFormat, {
     stream: {

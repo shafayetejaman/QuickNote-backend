@@ -1,15 +1,5 @@
-import mongoose, { Types } from "mongoose"
-
-interface NoteInterface {
-    user: Types.ObjectId
-    title: string
-    body: string
-    color: Types.ObjectId
-    subNotes: Types.ObjectId[]
-    tags: Types.ObjectId[]
-    category: Types.ObjectId
-    remainders: [Date]
-}
+import mongoose from "mongoose"
+import NoteInterface from "../interfaces/note.interface"
 
 const noteSchema = new mongoose.Schema<NoteInterface>(
     {
@@ -21,6 +11,7 @@ const noteSchema = new mongoose.Schema<NoteInterface>(
             type: String,
             required: true,
             maxlength: 50,
+            unique: true,
         },
         body: {
             type: String,

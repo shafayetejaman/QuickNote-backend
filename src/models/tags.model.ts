@@ -1,9 +1,5 @@
 import mongoose from "mongoose"
-
-interface TagInterface {
-    name: string
-    tagIcon: string
-}
+import TagInterface from "../interfaces/tag.interface"
 
 const tagSchema = new mongoose.Schema<TagInterface>({
     name: {

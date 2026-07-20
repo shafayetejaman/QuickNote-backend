@@ -1,9 +1,5 @@
 import mongoose from "mongoose"
-
-interface ColorInterface {
-    colorName: "blue" | "green" | "red"
-    hex: "#0000ff" | "#00ff00" | "#ff0000"
-}
+import ColorInterface from "../interfaces/color.interface"
 
 const colorSchema = new mongoose.Schema<ColorInterface>({
     colorName: {
