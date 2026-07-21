@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
-import TagInterface from "../interfaces/tag.interface"
+import ITag from "../interfaces/tag.interface"
 
-const tagSchema = new mongoose.Schema<TagInterface>({
+const tagSchema = new mongoose.Schema<ITag>({
     name: {
         type: String,
         required: true,
@@ -12,4 +12,4 @@ const tagSchema = new mongoose.Schema<TagInterface>({
     },
 })
 
-export const Tag = mongoose.model<TagInterface>("Tag", tagSchema)
+export const Tag = mongoose.model<ITag>("Tag", tagSchema)

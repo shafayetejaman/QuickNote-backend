@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
-import CategoryInterface from "../interfaces/category.interface"
+import ICategory from "../interfaces/category.interface"
 
-const categorySchema = new mongoose.Schema<CategoryInterface>({
+const categorySchema = new mongoose.Schema<ICategory>({
     name: {
         type: String,
         required: true,
@@ -12,7 +12,7 @@ const categorySchema = new mongoose.Schema<CategoryInterface>({
     },
 })
 
-export const Category = mongoose.model<CategoryInterface>(
+export const Category = mongoose.model<ICategory>(
     "Category",
     categorySchema
 )

@@ -3,9 +3,9 @@ import crypto from "crypto"
 import dayjs from "dayjs"
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose"
-import UserInterface from "../interfaces/user.interface"
+import IUser from "../interfaces/user.interface"
 
-const userSchema = new mongoose.Schema<UserInterface>({
+const userSchema = new mongoose.Schema<IUser>({
     username: {
         type: String,
         unique: true,
@@ -109,4 +109,4 @@ userSchema.methods.generateActivationToken = async function () {
     return { token: hasedToken, expiresAt }
 }
 
-export const User = mongoose.model<UserInterface>("User", userSchema)
+export const User = mongoose.model<IUser>("User", userSchema)

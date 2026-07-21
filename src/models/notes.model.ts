@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
-import NoteInterface from "../interfaces/note.interface"
+import INote from "../interfaces/note.interface"
 
-const noteSchema = new mongoose.Schema<NoteInterface>(
+const noteSchema = new mongoose.Schema<INote>(
     {
         user: {
             type: mongoose.Schema.ObjectId,
@@ -55,4 +55,4 @@ const noteSchema = new mongoose.Schema<NoteInterface>(
     { timestamps: true }
 )
 
-export const Note = mongoose.model<NoteInterface>("Note", noteSchema)
+export const Note = mongoose.model<INote>("Note", noteSchema)

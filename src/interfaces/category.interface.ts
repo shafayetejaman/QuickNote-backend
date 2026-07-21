@@ -1,4 +1,4 @@
-export default interface CategoryInterface {
+export default interface ICategory {
     name: string
     categoryIcon: string
 }

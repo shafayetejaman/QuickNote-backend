@@ -1,6 +1,6 @@
 import { Types } from "mongoose"
 
-export default interface NoteInterface {
+export default interface INote {
     user: Types.ObjectId
     title: string
     body: string

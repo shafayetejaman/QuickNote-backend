@@ -1,10 +1,11 @@
 import { Request } from "express"
-import Payload from "./playload.interface"
+import IPayload from "./playload.interface"
 
-export default interface CustomRequest extends Request {
-    user?: Payload
+export default interface ICustomRequest extends Request {
+    user?: IPayload
 
     files?: {
         profileImage?: Express.Multer.File[]
     }
+
 }

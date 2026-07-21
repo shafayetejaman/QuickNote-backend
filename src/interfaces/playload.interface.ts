@@ -1,4 +1,4 @@
-export default interface Payload {
+export default interface IPayload {
     id: string
     username: string
     timeStamp: number

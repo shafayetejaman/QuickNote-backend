@@ -28,7 +28,7 @@ const logger = createLogger({
 
 const morganFormat: string = ":method :url :status :response-time"
 
-import LogObject from "../interfaces/log.interface"
+import ILog from "../interfaces/log.interface"
 
 export const formatter = morgan(morganFormat, {
     stream: {
@@ -56,7 +56,7 @@ export const formatter = morgan(morganFormat, {
             )
 
             // Save clean JSON log (without color codes) to file
-            const logObject: LogObject = {
+            const logObject: ILog = {
                 method: status[0], // Method without color
                 url: status[1], // URL without color
                 status: status[2], // Status without color

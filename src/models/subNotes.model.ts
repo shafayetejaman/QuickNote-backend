@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
-import SubNoteInterface from "../interfaces/subNote.interface"
+import ISubNote from "../interfaces/subNote.interface"
 
-const subNoteSchema = new mongoose.Schema<SubNoteInterface>(
+const subNoteSchema = new mongoose.Schema<ISubNote>(
     {
         title: {
             type: String,
@@ -18,11 +18,16 @@ const subNoteSchema = new mongoose.Schema<SubNoteInterface>(
             required: true,
             ref: "Color",
         },
+        note: {
+            type: mongoose.Schema.ObjectId,
+            required: true,
+            ref: "Note",
+        },
     },
     { timestamps: true }
 )
 
-export const SubNote = mongoose.model<SubNoteInterface>(
+export const SubNote = mongoose.model<ISubNote>(
     "SubNote",
     subNoteSchema
 )

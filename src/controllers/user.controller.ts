@@ -1,9 +1,11 @@
 import { UploadApiResponse } from "cloudinary"
+import bcrypt from "bcrypt"
 import crypto from "crypto"
+import { matchedData } from "express-validator"
 import jwt from "jsonwebtoken"
 import { mongo } from "mongoose"
 import { userCache } from "../db/db"
-import Payload from "../interfaces/playload.interface"
+import IPayload from "../interfaces/playload.interface"
 import { User } from "../models/users.model"
 
 type UserDoc = InstanceType<typeof User>
@@ -87,14 +89,12 @@ export const loginUser = asyncHandler(async (req, res) => {
 })
 
 export const logoutUser = asyncHandler(async (req, res) => {
-    if (!req.user) throw new ApiError()
-
     const user =
-        (userCache.get(req.user.id) as UserDoc) ||
+        (userCache.get(req.user!.id) as UserDoc) ||
         (await User.findById(req.user.id))
     if (!user) throw new ApiError("Unable to find user", 500)
 
-    userCache.del(req.user.id)
+    userCache.del(req.user!.id)
     user.refreshToken = undefined
 
     await user.save()
@@ -119,7 +119,7 @@ export const getRefreshToken = asyncHandler(async (req, res) => {
         payload = jwt.verify(
             incommingRefreshToken,
             process.env.JWT_REFRESH_TOKEN as string
-        ) as Payload
+        ) as IPayload
     } catch (error) {
         throw new ApiError("Refresh token invalid!", 403, error)
     }
@@ -147,54 +147,40 @@ export const getRefreshToken = asyncHandler(async (req, res) => {
 })
 
 export const updateUser = asyncHandler(async (req, res) => {
-    if (!req.user) throw new ApiError()
-
-    const user =
-        (userCache.get(req.user.id) as UserDoc) ||
-        (await User.findById(req.user.id))
-    if (!user) throw new ApiError("Unable to find user", 500)
-
-    const { fullName, email, password, confPassword } = req.body
+    const { password, confPassword, ...rest } = matchedData(req)
     const profileImagePath = req.files?.profileImage?.[0]?.path
 
+    const updateData: Record<string, string> = { ...rest }
+
     if (password && confPassword) {
-        user.password = password
+        updateData.password = await bcrypt.hash(
+            password,
+            Number(process.env.BYCRYPT_ROUND)
+        )
     }
 
-    if (email) {
-        user.email = email
-    }
-
-    if (fullName) {
-        user.fullName = fullName
-    }
-
-    // uploading img to cloud
     let cloudinaryRespose: UploadApiResponse | null = null
     if (profileImagePath) {
         cloudinaryRespose = await imagefileUploder(profileImagePath)
         console.log("upload completed")
     }
 
-    // add extra fields
-    if (cloudinaryRespose?.url) req.user.profileImageUrl = cloudinaryRespose.url
+    if (cloudinaryRespose?.url)
+        updateData.profileImageUrl = cloudinaryRespose.url
 
-    // validating the given data
-    try {
-        await user.save()
-    } catch (error) {
-        if (error instanceof mongo.MongoServerError && error.code === 11000) {
-            throw new ApiError("Dublicate Email", 409, error)
-        }
+    const updatedUser = await User.findByIdAndUpdate(
+        req.user!.id,
+        { $set: updateData },
+        { new: true, runValidators: true }
+    )
 
+    if (!updatedUser)
         throw new ApiError("Unable to update the user profile!", 400, error)
-    }
 
-    // sending successfull
     return new ApiRespose(
         "User Updated Successfully!",
         201,
-        user.extractData()
+        updatedUser.extractData()
     ).send(res)
 })
 

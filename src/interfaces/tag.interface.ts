@@ -1,4 +1,4 @@
-export default interface TagInterface {
+export default interface ITag {
     name: string
     tagIcon: string
 }

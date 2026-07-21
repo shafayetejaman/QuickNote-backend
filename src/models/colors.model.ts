@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
-import ColorInterface from "../interfaces/color.interface"
+import IColor from "../interfaces/color.interface"
 
-const colorSchema = new mongoose.Schema<ColorInterface>({
+const colorSchema = new mongoose.Schema<IColor>({
     colorName: {
         type: String,
         enum: ["blue", "green", "red"],
@@ -14,4 +14,4 @@ const colorSchema = new mongoose.Schema<ColorInterface>({
     },
 })
 
-export const Color = mongoose.model<ColorInterface>("Color", colorSchema)
+export const Color = mongoose.model<IColor>("Color", colorSchema)

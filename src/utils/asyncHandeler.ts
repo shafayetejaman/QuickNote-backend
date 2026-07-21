@@ -1,15 +1,15 @@
 import { NextFunction, RequestHandler, Response } from "express"
-import { CustomRequest } from "../interfaces/request.interface"
+import ICustomRequest from "../interfaces/request.interface"
 
 export default function asyncHandler(
     func: (
-        req: CustomRequest,
+        req: ICustomRequest,
         res: Response,
         next: NextFunction
     ) => Promise<unknown>
 ): RequestHandler {
     return (req, res, next) => {
-        Promise.resolve(func(req as CustomRequest, res, next)).catch(
+        Promise.resolve(func(req as ICustomRequest, res, next)).catch(
             (error) => {
                 console.error("Error from asyncHandler: ", error)
                 next(error)

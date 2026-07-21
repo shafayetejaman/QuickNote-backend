@@ -1,4 +1,4 @@
-export default interface UserInterface {
+export default interface IUser {
     username: string
     fullName: string
     email: string
@@ -14,6 +14,6 @@ export default interface UserInterface {
         token: string
         expiresAt: Date
     }>
-    extractData: () => UserInterface
+    extractData: () => IUser
     save: () => null
 }
