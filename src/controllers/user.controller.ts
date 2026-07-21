@@ -6,9 +6,9 @@ import jwt from "jsonwebtoken"
 import { mongo } from "mongoose"
 import { userCache } from "../db/db"
 import IPayload from "../interfaces/playload.interface"
+import { IUserDoc } from "../interfaces/user.interface"
 import { User } from "../models/users.model"
 
-type UserDoc = InstanceType<typeof User>
 import ApiError from "../utils/apiError"
 import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
@@ -90,8 +90,8 @@ export const loginUser = asyncHandler(async (req, res) => {
 
 export const logoutUser = asyncHandler(async (req, res) => {
     const user =
-        (userCache.get(req.user!.id) as UserDoc) ||
-        (await User.findById(req.user.id))
+        (userCache.get(req.user!.id) as IUserDoc) ||
+        (await User.findById(req.user!.id))
     if (!user) throw new ApiError("Unable to find user", 500)
 
     userCache.del(req.user!.id)
@@ -125,7 +125,7 @@ export const getRefreshToken = asyncHandler(async (req, res) => {
     }
 
     const user =
-        (userCache.get(payload.id) as UserDoc) ||
+        (userCache.get(payload.id) as IUserDoc) ||
         (await User.findById(payload.id))
     if (!user) throw new ApiError("Refresh token invalid!", 403)
 
@@ -175,7 +175,7 @@ export const updateUser = asyncHandler(async (req, res) => {
     )
 
     if (!updatedUser)
-        throw new ApiError("Unable to update the user profile!", 400, error)
+        throw new ApiError("Unable to update the user profile!", 400)
 
     return new ApiRespose(
         "User Updated Successfully!",
@@ -187,7 +187,7 @@ export const updateUser = asyncHandler(async (req, res) => {
 export const activateUser = asyncHandler(async (req, res) => {
     const userId = req.query.userId as string
     const user =
-        (userCache.get(userId) as UserDoc) || (await User.findById(userId))
+        (userCache.get(userId) as IUserDoc) || (await User.findById(userId))
     if (!user) throw new ApiError("invalid user id", 401)
 
     if (!user?.activationToken || user.activationToken.expiresAt < new Date()) {

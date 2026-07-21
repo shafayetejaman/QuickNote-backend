@@ -1,11 +1,9 @@
 import crypto from "crypto"
-import { User } from "../models/users.model"
+import { IUserDoc } from "../interfaces/user.interface"
 import ApiError from "../utils/apiError"
 import EmailService from "../utils/sendMail"
 
-export async function setAccessAndRefereshToken(
-    user: InstanceType<typeof User>
-) {
+export async function setAccessAndRefereshToken(user: IUserDoc) {
     const accessToken = await user.generateAccessToken()
     const refreshToken = await user.generateRefreshToken()
 
@@ -19,9 +17,7 @@ export async function setAccessAndRefereshToken(
 
     return { accessToken, refreshToken }
 }
-export async function sendEmailWithActivationToken(
-    user: InstanceType<typeof User>
-) {
+export async function sendEmailWithActivationToken(user: IUserDoc) {
     const { token, expiresAt } = await user.generateActivationToken()
     const hasedToken = crypto
         .createHash("sha256")

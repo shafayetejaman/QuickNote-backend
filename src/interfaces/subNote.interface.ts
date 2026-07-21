@@ -1,4 +1,6 @@
-import { Types } from "mongoose"
+import { HydratedDocument, Types } from "mongoose"
+
+export type ISubNoteDoc = HydratedDocument<ISubNote>
 
 export default interface ISubNote {
     title: string

@@ -1,6 +1,7 @@
 import { Note } from "../models/notes.model"
+import { INoteDoc } from "../interfaces/note.interface"
 
-export function generateNoteWithTitle(note: InstanceType<typeof Note> | null) {
+export function generateNoteWithTitle(note: INoteDoc | null) {
     const newNote = new Note()
     if (!note) return newNote
 

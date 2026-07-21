@@ -1,4 +1,6 @@
-import { Types } from "mongoose"
+import { HydratedDocument, Types } from "mongoose"
+
+export type INoteDoc = HydratedDocument<INote>
 
 export default interface INote {
     user: Types.ObjectId

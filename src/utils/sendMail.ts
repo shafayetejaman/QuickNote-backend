@@ -1,6 +1,6 @@
 import nodemailer, { Transporter } from "nodemailer"
 import dotenv from "dotenv"
-import { User } from "../models/users.model"
+import { IUserDoc } from "../interfaces/user.interface"
 import fs from "fs"
 import path from "path"
 
@@ -31,7 +31,7 @@ class EmailService {
         return file
     }
 
-    async send(user: InstanceType<typeof User>, token: string) {
+    async send(user: IUserDoc, token: string) {
         const data = {
             username: user.username,
             token: `${process.env.BACKEND_URL}/api/v1/users/activate/?userId=${user.id}&token=${token}`,

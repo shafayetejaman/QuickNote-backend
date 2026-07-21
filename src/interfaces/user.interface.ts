@@ -1,3 +1,7 @@
+import { HydratedDocument } from "mongoose"
+
+export type IUserDoc = HydratedDocument<IUser>
+
 export default interface IUser {
     username: string
     fullName: string
