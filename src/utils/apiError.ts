@@ -6,7 +6,7 @@ export default class ApiError extends Error {
         cause: unknown = null,
         public data: null | object = null,
         public success = false,
-        public stack = ""
+        public stack = "",
     ) {
         super(message)
         this.cause = cause

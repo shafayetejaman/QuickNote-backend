@@ -1,9 +1,9 @@
 import { Router } from "express"
-import userRouter from "./user.router"
-import noteRouter from "./notes.router"
-import colorRouter from "./color.router"
-import tagRouter from "./tag.router"
 import categoryRouter from "./category.router"
+import colorRouter from "./color.router"
+import noteRouter from "./notes.router"
+import tagRouter from "./tag.router"
+import userRouter from "./user.router"
 
 const router = Router()
 

@@ -31,7 +31,7 @@ export const updateColor = asyncHandler(async (req, res) => {
     const color = await Color.findByIdAndUpdate(
         req.params.colorId,
         { $set: data },
-        { new: true, runValidators: true }
+        { new: true, runValidators: true },
     )
     if (!color) throw new ApiError("Color not found", 404)
 

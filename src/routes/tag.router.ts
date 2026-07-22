@@ -1,10 +1,10 @@
 import { Router } from "express"
 import {
+    createTag,
+    deleteTag,
     getAllTags,
     getTag,
-    createTag,
     updateTag,
-    deleteTag,
 } from "../controllers/tag.controller"
 import authMiddleware from "../middlewares/auth.middleware"
 import { isAdmin } from "../middlewares/isAdmin.middleware"
@@ -28,8 +28,6 @@ router
     .route("/:tagId")
     .patch(authMiddleware, isAdmin, updateTagValidator(), validate, updateTag)
 
-router
-    .route("/:tagId")
-    .delete(authMiddleware, isAdmin, deleteTag)
+router.route("/:tagId").delete(authMiddleware, isAdmin, deleteTag)
 
 export default router

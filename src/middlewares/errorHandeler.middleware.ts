@@ -1,4 +1,4 @@
-import { ErrorRequestHandler } from "express"
+import type { ErrorRequestHandler } from "express"
 import ApiError from "../utils/apiError"
 
 export const errorHandler: ErrorRequestHandler = (err, _req, res) => {

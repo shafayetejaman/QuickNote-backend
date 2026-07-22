@@ -1,11 +1,11 @@
 import { matchedData } from "express-validator"
+import mongoose, { mongo } from "mongoose"
 import { Note } from "../models/notes.model"
 import { SubNote } from "../models/subNotes.model"
 import ApiError from "../utils/apiError"
 import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
 import { generateNoteWithTitle } from "./notes.helper.controller"
-import mongoose, { mongo } from "mongoose"
 
 export const getAllNotes = asyncHandler(async (req, res) => {
     const notes = await Note.find({ user: req.user?.id })
@@ -20,7 +20,9 @@ export const getNote = asyncHandler(async (req, res) => {
         {
             $lookup: {
                 from: "$subNotes",
-                localField: "$",
+                localField: "",
+                foreignField: "",
+                as: "subNotes",
             },
         },
     ])
@@ -33,7 +35,7 @@ export const createNote = asyncHandler(async (req, res) => {
     const existing = await Note.findOne({ title: req.body.title })
     const newNote = generateNoteWithTitle(existing)
 
-    newNote.user = new mongoose.Types.ObjectId(req.user!.id)
+    newNote.user = new mongoose.Types.ObjectId(req.user?.id)
     newNote.body = req.body.body
 
     if (req.body.color) newNote.color = req.body.color
@@ -44,7 +46,7 @@ export const createNote = asyncHandler(async (req, res) => {
     await newNote.save()
 
     return new ApiRespose("New note created succesfully", 201, newNote).send(
-        res
+        res,
     )
 })
 
@@ -57,9 +59,9 @@ export const updateNote = asyncHandler(async (req, res) => {
     }
 
     const note = await Note.findByIdAndUpdate(
-        { _id: req.params.noteId, user: req.user!.id },
+        { _id: req.params.noteId, user: req.user?.id },
         { $set: data },
-        { new: true, runValidators: true }
+        { new: true, runValidators: true },
     )
     if (!note) throw new ApiError("Note not found", 404)
 
@@ -69,7 +71,7 @@ export const updateNote = asyncHandler(async (req, res) => {
 export const deleteNote = asyncHandler(async (req, res) => {
     const note = await Note.findOneAndDelete({
         _id: req.params.noteId,
-        user: req.user!.id,
+        user: req.user?.id,
     })
     if (!note) throw new ApiError("Note not found", 404)
 

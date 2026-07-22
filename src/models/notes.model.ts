@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import INote from "../interfaces/note.interface"
+import type INote from "../interfaces/note.interface"
 
 const noteSchema = new mongoose.Schema<INote>(
     {
@@ -52,7 +52,7 @@ const noteSchema = new mongoose.Schema<INote>(
             ],
         },
     },
-    { timestamps: true }
+    { timestamps: true },
 )
 
 export const Note = mongoose.model<INote>("Note", noteSchema)

@@ -8,7 +8,7 @@ const consoleLogFormat = format.combine(
     format.colorize(),
     format.printf(({ level, message, timestamp }) => {
         return `${level}: ${message} ${timestamp}`
-    })
+    }),
 )
 
 // Create a Winston logger
@@ -28,7 +28,7 @@ const logger = createLogger({
 
 const morganFormat: string = ":method :url :status :response-time"
 
-import ILog from "../interfaces/log.interface"
+import type ILog from "../interfaces/log.interface"
 
 export const formatter = morgan(morganFormat, {
     stream: {
@@ -52,7 +52,7 @@ export const formatter = morgan(morganFormat, {
 
             // Log colored message to the console
             logger.info(
-                `${coloredMessage.method} ${coloredMessage.url} ${coloredMessage.status} ${coloredMessage.responseTime}`
+                `${coloredMessage.method} ${coloredMessage.url} ${coloredMessage.status} ${coloredMessage.responseTime}`,
             )
 
             // Save clean JSON log (without color codes) to file
@@ -60,7 +60,7 @@ export const formatter = morgan(morganFormat, {
                 method: status[0], // Method without color
                 url: status[1], // URL without color
                 status: status[2], // Status without color
-                responseTime: status[3] + "ms", // Response time without color
+                responseTime: `${status[3]}ms`, // Response time without color
             }
 
             // Log the clean JSON object to the file (no color)

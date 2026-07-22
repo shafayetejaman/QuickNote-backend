@@ -1,6 +1,6 @@
-import mongoose from "mongoose"
 import { MongoMemoryReplSet } from "mongodb-memory-server"
-import { beforeAll, beforeEach, afterEach, afterAll } from "vitest"
+import mongoose from "mongoose"
+import { afterAll, afterEach, beforeAll, beforeEach } from "vitest"
 
 let replSet: MongoMemoryReplSet
 
@@ -13,7 +13,7 @@ process.env.FRONTEND_URL = "http://localhost:3000"
 process.env.BACKEND_URL = "http://localhost:8000"
 process.env.NODE_ENV = "test"
 
-mongoose.plugin(function (schema: mongoose.Schema) {
+mongoose.plugin((schema: mongoose.Schema) => {
     schema.pre("save", function () {
         const session = (global as any).__testSession
         if (session) this.$session(session)
@@ -56,7 +56,8 @@ beforeEach(async () => {
 
 afterEach(async () => {
     const session = (global as any).__testSession as
-        mongoose.ClientSession | undefined
+        | mongoose.ClientSession
+        | undefined
     if (session) {
         await session.abortTransaction()
         await session.endSession()

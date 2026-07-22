@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import ISubNote from "../interfaces/subNote.interface"
+import type ISubNote from "../interfaces/subNote.interface"
 
 const subNoteSchema = new mongoose.Schema<ISubNote>(
     {
@@ -24,10 +24,7 @@ const subNoteSchema = new mongoose.Schema<ISubNote>(
             ref: "Note",
         },
     },
-    { timestamps: true }
+    { timestamps: true },
 )
 
-export const SubNote = mongoose.model<ISubNote>(
-    "SubNote",
-    subNoteSchema
-)
+export const SubNote = mongoose.model<ISubNote>("SubNote", subNoteSchema)

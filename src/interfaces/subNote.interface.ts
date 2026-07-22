@@ -1,4 +1,4 @@
-import { HydratedDocument, Types } from "mongoose"
+import type { HydratedDocument, Types } from "mongoose"
 
 export type ISubNoteDoc = HydratedDocument<ISubNote>
 

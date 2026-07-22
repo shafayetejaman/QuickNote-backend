@@ -1,9 +1,9 @@
+import crypto from "node:crypto"
 import bycript from "bcrypt"
-import crypto from "crypto"
 import dayjs from "dayjs"
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose"
-import IUser from "../interfaces/user.interface"
+import type IUser from "../interfaces/user.interface"
 
 const userSchema = new mongoose.Schema<IUser>({
     username: {
@@ -49,7 +49,7 @@ userSchema.pre("save", async function () {
 
     this.password = await bycript.hash(
         this.password,
-        Number(process.env.BYCRYPT_ROUND)
+        Number(process.env.BYCRYPT_ROUND),
     )
 })
 
@@ -81,7 +81,7 @@ userSchema.methods.generateAccessToken = async function () {
         process.env.JWT_ACCESS_TOKEN as string,
         {
             expiresIn: (process.env.JWT_ACCESS_TOKEN_EXPIRY as "") || "1m",
-        }
+        },
     )
 }
 userSchema.methods.generateRefreshToken = async function () {
@@ -92,10 +92,10 @@ userSchema.methods.generateRefreshToken = async function () {
         process.env.JWT_REFRESH_TOKEN as string,
         {
             expiresIn: (process.env.JWT_REFRESH_TOKEN_EXPIRY as "") || "1m",
-        }
+        },
     )
 }
-userSchema.methods.generateActivationToken = async function () {
+userSchema.methods.generateActivationToken = async () => {
     const token = crypto.randomBytes(32)
     const hasedToken = crypto
         .createHash("sha256")

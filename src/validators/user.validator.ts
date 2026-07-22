@@ -26,7 +26,7 @@ export function registerUserQueryValidator() {
             .withMessage(
                 "Password must contain at least 8 characters, " +
                     "including 1 letter, " +
-                    "and 1 number"
+                    "and 1 number",
             ),
     ]
 }
@@ -58,7 +58,7 @@ export function updateUserQueryValidator() {
             .withMessage(
                 "Password must contain at least 8 characters, " +
                     "including 1 letter, " +
-                    "and 1 number"
+                    "and 1 number",
             ),
 
         commonBodyValidator("confPassword", true)

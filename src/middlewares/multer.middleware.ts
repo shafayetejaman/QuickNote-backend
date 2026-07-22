@@ -1,13 +1,13 @@
+import path from "node:path"
 import multer from "multer"
-import path from "path"
 import constants from "../constants"
 
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: (_req, _file, cb) => {
         cb(null, constants.PUBLIC_IMAGE_PATH)
     },
-    filename: function (req, file, cb) {
-        const newFileName = Date.now() + "-" + Math.round(Math.random() * 1e9)
+    filename: (_req, file, cb) => {
+        const newFileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}`
         cb(null, newFileName + path.extname(file.originalname))
     },
 })

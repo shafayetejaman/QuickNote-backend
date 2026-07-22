@@ -1,5 +1,5 @@
+import type { INoteDoc } from "../interfaces/note.interface"
 import { Note } from "../models/notes.model"
-import { INoteDoc } from "../interfaces/note.interface"
 
 export function generateNoteWithTitle(note: INoteDoc | null) {
     const newNote = new Note()
@@ -11,12 +11,12 @@ export function generateNoteWithTitle(note: INoteDoc | null) {
 
     if (pos !== -1) {
         try {
-            num += parseInt(title.slice(pos + 2, title.length))
+            num += parseInt(title.slice(pos + 2, title.length), 10)
         } catch {
             num = 0
         }
     }
-    newNote.title = note.title + (num > 0) ? "--" + num.toString() : ""
+    newNote.title = note.title + (num > 0) ? `--${num.toString()}` : ""
 
     return newNote
 }

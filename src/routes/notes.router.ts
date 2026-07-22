@@ -1,30 +1,30 @@
 import { Router } from "express"
 import {
+    createNote,
+    deleteNote,
     getAllNotes,
     getNote,
-    createNote,
     updateNote,
-    deleteNote,
 } from "../controllers/notes.controller"
 import {
-    getSubNotesByNote,
-    getSubNote,
     createSubNote,
-    updateSubNote,
     deleteSubNote,
+    getSubNote,
+    getSubNotesByNote,
+    updateSubNote,
 } from "../controllers/subNote.controller"
 import authMiddleware from "../middlewares/auth.middleware"
 import {
     createNoteValidator,
-    updateNoteValidator,
-    getNoteValidator,
     deleteNoteValidator,
+    getNoteValidator,
+    updateNoteValidator,
 } from "../validators/notes.validator"
 import {
     createSubNoteValidator,
-    updateSubNoteValidator,
-    getSubNoteValidator,
     deleteSubNoteValidator,
+    getSubNoteValidator,
+    updateSubNoteValidator,
 } from "../validators/subNote.validator"
 import { validate } from "../validators/validate"
 

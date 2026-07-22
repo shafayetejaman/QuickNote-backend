@@ -1,4 +1,4 @@
-import { Response } from "express"
+import type { Response } from "express"
 
 export default class ApiRespose {
     success: boolean
@@ -6,7 +6,7 @@ export default class ApiRespose {
     constructor(
         public message = "OK",
         public statusCode = 200,
-        public data = {}
+        public data = {},
     ) {
         this.success = statusCode < 400
     }

@@ -1,10 +1,10 @@
 import { Router } from "express"
 import {
+    createColor,
+    deleteColor,
     getAllColors,
     getColor,
-    createColor,
     updateColor,
-    deleteColor,
 } from "../controllers/color.controller"
 import authMiddleware from "../middlewares/auth.middleware"
 import { isAdmin } from "../middlewares/isAdmin.middleware"
@@ -22,14 +22,24 @@ router.route("/:colorId").get(getColor)
 
 router
     .route("/")
-    .post(authMiddleware, isAdmin, createColorValidator(), validate, createColor)
+    .post(
+        authMiddleware,
+        isAdmin,
+        createColorValidator(),
+        validate,
+        createColor,
+    )
 
 router
     .route("/:colorId")
-    .patch(authMiddleware, isAdmin, updateColorValidator(), validate, updateColor)
+    .patch(
+        authMiddleware,
+        isAdmin,
+        updateColorValidator(),
+        validate,
+        updateColor,
+    )
 
-router
-    .route("/:colorId")
-    .delete(authMiddleware, isAdmin, deleteColor)
+router.route("/:colorId").delete(authMiddleware, isAdmin, deleteColor)
 
 export default router

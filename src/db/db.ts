@@ -40,7 +40,7 @@ export async function dbConnect(): Promise<typeof mongoose> {
             .then((mongooseInstance) => {
                 console.log(
                     "DB connected to:",
-                    mongooseInstance.connection.host
+                    mongooseInstance.connection.host,
                 )
                 return mongooseInstance
             })

@@ -3,9 +3,9 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
-        "lint": "eslint ./src",
+        "lint": "biome check ./src",
         "start": "nodemon",
-        "format": "prettier --write .",
+        "format": "biome format --write .",
         "log": "ts-node ./src/utils/printLog",
         "build": "npm run test && tsc && mkdir -p dist/templates && cp src/templates/* dist/templates/",
         "test": "vitest run",
@@ -34,7 +34,7 @@
         "nodemailer": "^9.0.1"
     },
     "devDependencies": {
-        "@eslint/js": "^10.0.1",
+        "@biomejs/biome": "2.5.4",
         "@types/bcrypt": "^6.0.0",
         "@types/compression": "^1.8.1",
         "@types/cookie-parser": "^1.4.10",
@@ -47,14 +47,10 @@
         "@types/node": "^25.9.5",
         "@types/nodemailer": "^8.0.0",
         "@types/supertest": "^7.2.0",
-        "eslint": "^10.2.1",
-        "globals": "^17.5.0",
         "mongodb-memory-server": "^11.2.0",
         "nodemon": "^3.1.14",
-        "prettier": "^3.8.3",
         "supertest": "^7.2.2",
         "typescript": "^6.0.3",
-        "typescript-eslint": "^8.63.0",
         "vitest": "^4.1.9",
         "winston": "^3.19.0"
     },

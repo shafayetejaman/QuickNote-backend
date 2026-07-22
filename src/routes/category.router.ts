@@ -1,10 +1,10 @@
 import { Router } from "express"
 import {
+    createCategory,
+    deleteCategory,
     getAllCategories,
     getCategory,
-    createCategory,
     updateCategory,
-    deleteCategory,
 } from "../controllers/category.controller"
 import authMiddleware from "../middlewares/auth.middleware"
 import { isAdmin } from "../middlewares/isAdmin.middleware"
@@ -22,14 +22,24 @@ router.route("/:categoryId").get(getCategory)
 
 router
     .route("/")
-    .post(authMiddleware, isAdmin, createCategoryValidator(), validate, createCategory)
+    .post(
+        authMiddleware,
+        isAdmin,
+        createCategoryValidator(),
+        validate,
+        createCategory,
+    )
 
 router
     .route("/:categoryId")
-    .patch(authMiddleware, isAdmin, updateCategoryValidator(), validate, updateCategory)
+    .patch(
+        authMiddleware,
+        isAdmin,
+        updateCategoryValidator(),
+        validate,
+        updateCategory,
+    )
 
-router
-    .route("/:categoryId")
-    .delete(authMiddleware, isAdmin, deleteCategory)
+router.route("/:categoryId").delete(authMiddleware, isAdmin, deleteCategory)
 
 export default router

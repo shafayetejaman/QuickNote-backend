@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import IColor from "../interfaces/color.interface"
+import type IColor from "../interfaces/color.interface"
 
 const colorSchema = new mongoose.Schema<IColor>({
     colorName: {

@@ -1,5 +1,5 @@
-import { Request } from "express"
-import IPayload from "./playload.interface"
+import type { Request } from "express"
+import type IPayload from "./playload.interface"
 
 export default interface ICustomRequest extends Request {
     user?: IPayload
@@ -7,5 +7,4 @@ export default interface ICustomRequest extends Request {
     files?: {
         profileImage?: Express.Multer.File[]
     }
-
 }

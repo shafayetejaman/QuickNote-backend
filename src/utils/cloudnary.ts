@@ -1,6 +1,7 @@
+import fs from "node:fs"
 import { v2 as cloudinary } from "cloudinary"
-import fs from "fs"
 import ApiError from "./apiError"
+
 // Configuration
 
 cloudinary.config({

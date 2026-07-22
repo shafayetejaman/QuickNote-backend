@@ -1,4 +1,4 @@
-import { RequestHandler } from "express"
+import type { RequestHandler } from "express"
 import { validationResult } from "express-validator"
 import ApiError from "../utils/apiError"
 

@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import ITag from "../interfaces/tag.interface"
+import type ITag from "../interfaces/tag.interface"
 
 const tagSchema = new mongoose.Schema<ITag>({
     name: {

@@ -1,4 +1,4 @@
-import * as fs from "fs"
+import * as fs from "node:fs"
 
 // Function to safely parse JSON
 function safeParse(jsonString: string) {

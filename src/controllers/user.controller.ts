@@ -1,14 +1,14 @@
-import { UploadApiResponse } from "cloudinary"
+import crypto from "node:crypto"
 import bcrypt from "bcrypt"
-import crypto from "crypto"
+import type { UploadApiResponse } from "cloudinary"
 import { matchedData } from "express-validator"
 import jwt from "jsonwebtoken"
 import { mongo } from "mongoose"
+import { COOKIE_OPTIONS, COOKIE_OPTIONS_WITH_PATH } from "../constants"
 import { userCache } from "../db/db"
-import IPayload from "../interfaces/playload.interface"
-import { IUserDoc } from "../interfaces/user.interface"
+import type IPayload from "../interfaces/playload.interface"
+import type { IUserDoc } from "../interfaces/user.interface"
 import { User } from "../models/users.model"
-
 import ApiError from "../utils/apiError"
 import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
@@ -17,7 +17,6 @@ import {
     sendEmailWithActivationToken,
     setAccessAndRefereshToken,
 } from "./user.heper.controller"
-import { COOKIE_OPTIONS, COOKIE_OPTIONS_WITH_PATH } from "../constants"
 
 export const registerUser = asyncHandler(async (req, res) => {
     const data = req.body
@@ -50,7 +49,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     return new ApiRespose(
         "User created Successfully!",
         201,
-        user.extractData()
+        user.extractData(),
     ).send(res)
 })
 
@@ -78,7 +77,7 @@ export const loginUser = asyncHandler(async (req, res) => {
     res.cookie("accessToken", accessToken, COOKIE_OPTIONS).cookie(
         "refreshToken",
         refreshToken,
-        COOKIE_OPTIONS_WITH_PATH
+        COOKIE_OPTIONS_WITH_PATH,
     )
 
     return new ApiRespose("user logged in!", statusCode, {
@@ -90,18 +89,18 @@ export const loginUser = asyncHandler(async (req, res) => {
 
 export const logoutUser = asyncHandler(async (req, res) => {
     const user =
-        (userCache.get(req.user!.id) as IUserDoc) ||
-        (await User.findById(req.user!.id))
+        (userCache.get(req.user?.id) as IUserDoc) ||
+        (await User.findById(req.user?.id))
     if (!user) throw new ApiError("Unable to find user", 500)
 
-    userCache.del(req.user!.id)
+    userCache.del(req.user?.id)
     user.refreshToken = undefined
 
     await user.save()
 
     res.clearCookie("accessToken", COOKIE_OPTIONS).clearCookie(
         "refreshToken",
-        COOKIE_OPTIONS_WITH_PATH
+        COOKIE_OPTIONS_WITH_PATH,
     )
 
     return new ApiRespose("user logged out!").send(res)
@@ -114,11 +113,11 @@ export const getRefreshToken = asyncHandler(async (req, res) => {
 
     if (!incommingRefreshToken) throw new ApiError("Refresh token needed!", 403)
 
-    let payload
+    let payload: IPayload
     try {
         payload = jwt.verify(
             incommingRefreshToken,
-            process.env.JWT_REFRESH_TOKEN as string
+            process.env.JWT_REFRESH_TOKEN as string,
         ) as IPayload
     } catch (error) {
         throw new ApiError("Refresh token invalid!", 403, error)
@@ -137,7 +136,7 @@ export const getRefreshToken = asyncHandler(async (req, res) => {
     res.cookie("accessToken", accessToken, COOKIE_OPTIONS).cookie(
         "refreshToken",
         refreshToken,
-        COOKIE_OPTIONS_WITH_PATH
+        COOKIE_OPTIONS_WITH_PATH,
     )
 
     return new ApiRespose("User Token refreshed!", statusCodoe, {
@@ -155,7 +154,7 @@ export const updateUser = asyncHandler(async (req, res) => {
     if (password && confPassword) {
         updateData.password = await bcrypt.hash(
             password,
-            Number(process.env.BYCRYPT_ROUND)
+            Number(process.env.BYCRYPT_ROUND),
         )
     }
 
@@ -169,9 +168,9 @@ export const updateUser = asyncHandler(async (req, res) => {
         updateData.profileImageUrl = cloudinaryRespose.url
 
     const updatedUser = await User.findByIdAndUpdate(
-        req.user!.id,
+        req.user?.id,
         { $set: updateData },
-        { new: true, runValidators: true }
+        { new: true, runValidators: true },
     )
 
     if (!updatedUser)
@@ -180,7 +179,7 @@ export const updateUser = asyncHandler(async (req, res) => {
     return new ApiRespose(
         "User Updated Successfully!",
         201,
-        updatedUser.extractData()
+        updatedUser.extractData(),
     ).send(res)
 })
 

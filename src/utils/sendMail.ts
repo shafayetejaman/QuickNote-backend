@@ -1,8 +1,8 @@
-import nodemailer, { Transporter } from "nodemailer"
+import fs from "node:fs"
+import path from "node:path"
 import dotenv from "dotenv"
-import { IUserDoc } from "../interfaces/user.interface"
-import fs from "fs"
-import path from "path"
+import nodemailer, { type Transporter } from "nodemailer"
+import type { IUserDoc } from "../interfaces/user.interface"
 
 dotenv.config()
 
@@ -22,7 +22,7 @@ class EmailService {
     private getTemplate(data: Record<string, string>): string {
         let file = fs.readFileSync(
             path.join(__dirname, "../templates", "activationEmail.html"),
-            "utf8"
+            "utf8",
         )
         for (const [key, val] of Object.entries(data)) {
             const regex = new RegExp(`{{${key}}}`, "g")

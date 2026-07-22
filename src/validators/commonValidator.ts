@@ -1,11 +1,11 @@
-import { body, query } from "express-validator"
+import { body, query, type ValidationChain } from "express-validator"
 
 export function commonBodyValidator(
     name: string,
     optional = false,
-    baseMessage = `Invalid ${name}!`
+    baseMessage = `Invalid ${name}!`,
 ) {
-    let Body
+    let Body: ValidationChain
     if (optional) Body = body(name, baseMessage).optional()
     else
         Body = body(name, baseMessage)
@@ -18,9 +18,9 @@ export function commonBodyValidator(
 export function commonQueryValidator(
     name: string,
     optional = false,
-    baseMessage = `Invalid param ${name}!`
+    baseMessage = `Invalid param ${name}!`,
 ) {
-    let Query
+    let Query: ValidationChain
     if (optional) Query = query(name, baseMessage).optional()
     else
         Query = query(name, baseMessage)

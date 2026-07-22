@@ -28,7 +28,7 @@ router.route("/register").post(
     ]),
     registerUserQueryValidator(),
     validate,
-    registerUser
+    registerUser,
 )
 router.route("/login").post(loginUserQueryValidator(), validate, loginUser)
 router
@@ -48,7 +48,7 @@ router.route("/update-user-data").post(
     authMiddleware,
     updateUserQueryValidator(),
     validate,
-    updateUser
+    updateUser,
 )
 
 export default router

@@ -31,7 +31,7 @@ export const updateTag = asyncHandler(async (req, res) => {
     const tag = await Tag.findByIdAndUpdate(
         req.params.tagId,
         { $set: data },
-        { new: true, runValidators: true }
+        { new: true, runValidators: true },
     )
     if (!tag) throw new ApiError("Tag not found", 404)
 

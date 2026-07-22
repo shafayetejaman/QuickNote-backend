@@ -1,5 +1,5 @@
-import { commonBodyValidator } from "./commonValidator"
 import { param } from "express-validator"
+import { commonBodyValidator } from "./commonValidator"
 
 export function createCategoryValidator() {
     return [

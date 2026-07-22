@@ -1,4 +1,4 @@
-import { HydratedDocument } from "mongoose"
+import type { HydratedDocument } from "mongoose"
 
 export type IColorDoc = HydratedDocument<IColor>
 

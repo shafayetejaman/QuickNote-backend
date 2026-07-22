@@ -1,5 +1,5 @@
-import crypto from "crypto"
-import { IUserDoc } from "../interfaces/user.interface"
+import crypto from "node:crypto"
+import type { IUserDoc } from "../interfaces/user.interface"
 import ApiError from "../utils/apiError"
 import EmailService from "../utils/sendMail"
 
