@@ -1,8 +1,6 @@
 import { commonBodyValidator } from "./commonValidator"
 import { param } from "express-validator"
 
-const invalidDomian: string[] = []
-
 export function createNoteValidator() {
     return [
         commonBodyValidator("title")
