@@ -5,7 +5,7 @@ import ApiError from "../utils/apiError"
 import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
 import { generateNoteWithTitle } from "./notes.helper.controller"
-import { mongo } from "mongoose"
+import mongoose, { mongo } from "mongoose"
 
 export const getAllNotes = asyncHandler(async (req, res) => {
     const notes = await Note.find({ user: req.user?.id })
@@ -15,7 +15,15 @@ export const getAllNotes = asyncHandler(async (req, res) => {
 })
 
 export const getNote = asyncHandler(async (req, res) => {
-    const note = await Note.findOne({ _id: req.params.noteId })
+    const note = await Note.aggregate([
+        { $match: { _id: new mongo.ObjectId(req.query.id as string) } },
+        {
+            $lookup: {
+                from: "$subNotes",
+                localField: "$",
+            },
+        },
+    ])
     if (!note) throw new ApiError("Note not found", 404)
 
     return new ApiRespose("Note fetched successfully", 200, note).send(res)
@@ -25,7 +33,7 @@ export const createNote = asyncHandler(async (req, res) => {
     const existing = await Note.findOne({ title: req.body.title })
     const newNote = generateNoteWithTitle(existing)
 
-    newNote.user = new mongo.ObjectId(req.user!.id)
+    newNote.user = new mongoose.Types.ObjectId(req.user!.id)
     newNote.body = req.body.body
 
     if (req.body.color) newNote.color = req.body.color

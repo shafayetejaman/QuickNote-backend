@@ -8,6 +8,18 @@ import { formatter } from "./middlewares/logger.middleware"
 import ApiRespose from "./utils/apiResponse"
 import { dbConnect } from "./db/db"
 import router from "./routes/index"
+import mongoose from "mongoose"
+
+// set _id to id for all response
+mongoose.plugin((schema) => {
+    schema.set("toJSON", {
+        transform(doc, ret: Record<string, unknown>) {
+            ret.id = String(ret._id)
+            delete ret._id
+            delete ret.__v
+        },
+    })
+})
 
 const app = express()
 
@@ -22,7 +34,6 @@ app.use(express.static("public"))
 app.use(express.urlencoded({ extended: true, limit: constants.LIMIT }))
 app.use(formatter)
 app.use(cookieParser())
-app.use("/api", router)
 app.use(
     cors({
         origin: process.env.FRONTEND_URL,
@@ -41,6 +52,7 @@ app.use(async (_req, _res, next) => {
     }
 })
 
+app.use("/api", router)
 // error middleware for sending error respose to user
 app.use(errorHandler)
 

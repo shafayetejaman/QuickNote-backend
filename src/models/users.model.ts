@@ -60,10 +60,7 @@ userSchema.methods.isPasswordMatch = async function (password: string) {
 userSchema.methods.extractData = function () {
     const userData = this.toObject()
 
-    userData.id = userData._id.toString()
-
-    // delete the fields that can not be returned
-    delete userData._id
+    // delete the fields that should not be returned
     delete userData.password
     delete userData.refreshToken
     delete userData.activationToken
