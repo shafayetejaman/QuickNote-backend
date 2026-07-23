@@ -1,29 +1,23 @@
+import { MongoMemoryReplSet } from "mongodb-memory-server"
 import mongoose from "mongoose"
+import app from "../src/app"
 
 process.env.JWT_ACCESS_TOKEN = "seed-access-token-secret"
 process.env.JWT_REFRESH_TOKEN = "seed-refresh-token-secret"
 process.env.JWT_ACCESS_TOKEN_EXPIRY = "1h"
 process.env.JWT_REFRESH_TOKEN_EXPIRY = "7d"
 process.env.BYCRYPT_ROUND = "10"
-
-const MONGODB_URI = `${process.env.MON_URI}/${process.env.DB_NAME}`
+process.env.FRONTEND_URL = "http://localhost:3000"
+process.env.BACKEND_URL = "http://localhost:8000"
 
 async function seed() {
-    console.log("Connecting to MongoDB...")
-    await mongoose.connect(MONGODB_URI)
-    console.log("Connected to:", mongoose.connection.host)
-
-    const db = mongoose.connection.db
-    if (!db) {
-        throw new Error("Could not access database")
-    }
-
-    console.log("\nDropping existing collections...")
-    const collections = await db.listCollections().toArray()
-    for (const col of collections) {
-        await db.dropCollection(col.name)
-        console.log(`  Dropped: ${col.name}`)
-    }
+    console.log("Starting in-memory MongoDB replica set...")
+    const replSet = await MongoMemoryReplSet.create({
+        replSet: { count: 1, storageEngine: "wiredTiger" },
+    })
+    const uri = replSet.getUri()
+    await mongoose.connect(uri)
+    console.log("Connected to in-memory database.")
 
     const { User } = await import("../src/models/users.model")
     const { Note } = await import("../src/models/notes.model")
@@ -188,8 +182,14 @@ async function seed() {
     console.log(`  Notes:     5`)
     console.log(`  SubNotes:  3`)
 
-    await mongoose.disconnect()
-    console.log("\nDisconnected from MongoDB.")
+    process.env.NODE_ENV = "test"
+    const PORT = 8000
+    app.listen(PORT, () => {
+        console.log(`\nServer running at http://localhost:${PORT}`)
+        console.log("Seeded credentials:")
+        console.log("  Admin: admin / admin1234")
+        console.log("  User:  johndoe / password123")
+    })
 }
 
 seed().catch((err) => {
