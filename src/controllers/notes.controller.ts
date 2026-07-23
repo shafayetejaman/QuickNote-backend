@@ -1,5 +1,5 @@
 import { matchedData } from "express-validator"
-import mongoose, { mongo } from "mongoose"
+import mongoose from "mongoose"
 import { Note } from "../models/notes.model"
 import { SubNote } from "../models/subNotes.model"
 import ApiError from "../utils/apiError"
@@ -15,17 +15,12 @@ export const getAllNotes = asyncHandler(async (req, res) => {
 })
 
 export const getNote = asyncHandler(async (req, res) => {
-    const note = await Note.aggregate([
-        { $match: { _id: new mongo.ObjectId(req.query.id as string) } },
-        {
-            $lookup: {
-                from: "$subNotes",
-                localField: "",
-                foreignField: "",
-                as: "subNotes",
-            },
-        },
-    ])
+    const note = await Note.findById(req.query.noteId)
+        .populate("subNotes")
+        .populate("tags")
+        .populate("color")
+        .populate("category")
+
     if (!note) throw new ApiError("Note not found", 404)
 
     return new ApiRespose("Note fetched successfully", 200, note).send(res)
@@ -35,7 +30,7 @@ export const createNote = asyncHandler(async (req, res) => {
     const existing = await Note.findOne({ title: req.body.title })
     const newNote = generateNoteWithTitle(existing)
 
-    newNote.user = new mongoose.Types.ObjectId(req.user?.id)
+    newNote.user = new mongoose.Types.ObjectId(req.user!.id)
     newNote.body = req.body.body
 
     if (req.body.color) newNote.color = req.body.color
@@ -59,7 +54,7 @@ export const updateNote = asyncHandler(async (req, res) => {
     }
 
     const note = await Note.findByIdAndUpdate(
-        { _id: req.params.noteId, user: req.user?.id },
+        { _id: req.params.noteId, user: req.user!.id },
         { $set: data },
         { new: true, runValidators: true },
     )
@@ -71,7 +66,7 @@ export const updateNote = asyncHandler(async (req, res) => {
 export const deleteNote = asyncHandler(async (req, res) => {
     const note = await Note.findOneAndDelete({
         _id: req.params.noteId,
-        user: req.user?.id,
+        user: req.user!.id,
     })
     if (!note) throw new ApiError("Note not found", 404)
 
