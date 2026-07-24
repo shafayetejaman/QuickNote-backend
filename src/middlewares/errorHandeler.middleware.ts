@@ -1,7 +1,7 @@
 import type { ErrorRequestHandler } from "express"
 import ApiError from "../utils/apiError"
 
-export const errorHandler: ErrorRequestHandler = (err, _req, res) => {
+export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
     console.error("\n===  SYSTEM ERROR LOG  ===")
     console.error(err.stack || err)
     console.error(err?.cause?.stack)

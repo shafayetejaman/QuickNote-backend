@@ -2,24 +2,12 @@ import compression from "compression"
 import cookieParser from "cookie-parser"
 import cors from "cors"
 import express from "express"
-import mongoose from "mongoose"
 import constants from "./constants"
 import { dbConnect } from "./db/db"
 import { errorHandler } from "./middlewares/errorHandeler.middleware"
 import { formatter } from "./middlewares/logger.middleware"
 import router from "./routes/index"
 import ApiRespose from "./utils/apiResponse"
-
-// set _id to id for all response
-mongoose.plugin((schema) => {
-    schema.set("toJSON", {
-        transform(_doc, ret: Record<string, unknown>) {
-            ret.id = String(ret._id)
-            delete ret._id
-            delete ret.__v
-        },
-    })
-})
 
 const app = express()
 

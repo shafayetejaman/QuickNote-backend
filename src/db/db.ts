@@ -2,6 +2,23 @@ import mongoose from "mongoose"
 import NodeCache from "node-cache"
 import { MONGODB_URI } from "../constants"
 
+mongoose.plugin((schema) => {
+    schema.set("toJSON", {
+        transform(_doc, ret: Record<string, unknown>) {
+            ret.id = String(ret._id)
+            delete ret._id
+            delete ret.__v
+        },
+    })
+    schema.set("toObject", {
+        transform(_doc, ret: Record<string, unknown>) {
+            ret.id = String(ret._id)
+            delete ret._id
+            delete ret.__v
+        },
+    })
+})
+
 // 1. Make the global property explicitly required once initialized
 declare global {
     var mongooseConnection:
