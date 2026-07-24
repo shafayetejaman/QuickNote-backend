@@ -1,5 +1,5 @@
 import { matchedData } from "express-validator"
-import mongoose from "mongoose"
+import mongoose, { mongo } from "mongoose"
 import { Note } from "../models/notes.model"
 import { SubNote } from "../models/subNotes.model"
 import ApiError from "../utils/apiError"
@@ -7,14 +7,65 @@ import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
 import { generateNoteWithTitle } from "./notes.helper.controller"
 
+const commonNoteAggregation = () => {
+    return [
+        {
+            $lookup: {
+                from: "tags",
+                localField: "tags",
+                foreignField: "_id",
+                as: "tags",
+            },
+        },
+        {
+            $lookup: {
+                from: "colors",
+                localField: "color",
+                foreignField: "_id",
+                as: "color",
+                pipeline: [
+                    {
+                        $unset: ["_id", "colorName", "__v"],
+                    },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: "categories",
+                localField: "category",
+                foreignField: "_id",
+                as: "category",
+            },
+        },
+        {
+            $addFields: {
+                color: { $first: "$color" },
+                category: { $first: "$category" },
+            },
+        },
+    ]
+}
+
 export const getAllNotes = asyncHandler(async (req, res) => {
-    const notes = await Note.find({ user: req.user!.id })
-        .populate([
-            { path: "tags" },
-            { path: "color", select: "-_id -colorName" },
-            { path: "category" },
-        ])
-        .select("title")
+    const notes = await Note.aggregate([
+        {
+            $match: {
+                user: new mongo.ObjectId(req.user!.id),
+            },
+        },
+        ...commonNoteAggregation(),
+        {
+            $project: {
+                body: 0,
+                subNotes: 0,
+                createdAt: 0,
+                remainders: 0,
+                user: 0,
+                __v: 0,
+            },
+        },
+    ])
 
     if (!notes) throw new ApiError("User not found")
 
@@ -22,18 +73,51 @@ export const getAllNotes = asyncHandler(async (req, res) => {
 })
 
 export const getNote = asyncHandler(async (req, res) => {
-    const note = await Note.find({ user: req.user!.id })
-        .populate([
-            {
-                path: "subNotes",
-                select: "-note",
-                populate: { path: "color", select: "-_id -colorName" },
+    const note = await Note.aggregate([
+        {
+            $match: {
+                _id: new mongo.ObjectId(req.query.id as string),
             },
-            { path: "tags" },
-            { path: "color", select: "-_id -colorName" },
-            { path: "category" },
-        ])
-        .select("-user")
+        },
+        ...commonNoteAggregation(),
+        {
+            $lookup: {
+                from: "subnotes",
+                localField: "subNotes",
+                foreignField: "_id",
+                as: "subNotes",
+                pipeline: [
+                    {
+                        $unset: ["note"],
+                    },
+                    {
+                        $lookup: {
+                            from: "colors",
+                            localField: "color",
+                            foreignField: "_id",
+                            as: "color",
+                            pipeline: [
+                                {
+                                    $unset: ["_id", "colorName", "__v"],
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        $addFields: {
+                            color: { $first: "$color" },
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $project: {
+                user: 0,
+                __v: 0,
+            },
+        },
+    ])
 
     if (!note) throw new ApiError("Note not found", 404)
 
