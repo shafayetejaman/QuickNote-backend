@@ -5,14 +5,14 @@ import { MONGODB_URI } from "../constants"
 mongoose.plugin((schema) => {
     schema.set("toJSON", {
         transform(_doc, ret: Record<string, unknown>) {
-            ret.id = String(ret._id)
+            if (ret._id) ret.id = String(ret._id)
             delete ret._id
             delete ret.__v
         },
     })
     schema.set("toObject", {
         transform(_doc, ret: Record<string, unknown>) {
-            ret.id = String(ret._id)
+            if (ret._id) ret.id = String(ret._id)
             delete ret._id
             delete ret.__v
         },

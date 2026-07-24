@@ -8,18 +8,32 @@ import asyncHandler from "../utils/asyncHandeler"
 import { generateNoteWithTitle } from "./notes.helper.controller"
 
 export const getAllNotes = asyncHandler(async (req, res) => {
-    const notes = await Note.find({ user: req.user?.id })
+    const notes = await Note.find({ user: req.user!.id })
+        .populate([
+            { path: "tags" },
+            { path: "color", select: "-_id -colorName" },
+            { path: "category" },
+        ])
+        .select("title")
+
     if (!notes) throw new ApiError("User not found")
 
     return new ApiRespose("Notes of the user", 200, notes).send(res)
 })
 
 export const getNote = asyncHandler(async (req, res) => {
-    const note = await Note.findById(req.query.noteId)
-        .populate("subNotes")
-        .populate("tags")
-        .populate("color")
-        .populate("category")
+    const note = await Note.find({ user: req.user!.id })
+        .populate([
+            {
+                path: "subNotes",
+                select: "-note",
+                populate: { path: "color", select: "-_id -colorName" },
+            },
+            { path: "tags" },
+            { path: "color", select: "-_id -colorName" },
+            { path: "category" },
+        ])
+        .select("-user")
 
     if (!note) throw new ApiError("Note not found", 404)
 

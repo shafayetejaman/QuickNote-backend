@@ -7,7 +7,7 @@ const { combine, timestamp, json } = format
 const consoleLogFormat = format.combine(
     format.colorize(),
     format.printf(({ level, message, timestamp }) => {
-        return `${level}: ${message} ${timestamp}`
+        return `${level}: ${message} ${timestamp}\n`
     }),
 )
 
@@ -27,8 +27,6 @@ const logger = createLogger({
 })
 
 const morganFormat: string = ":method :url :status :response-time"
-
-import type ILog from "../interfaces/log.interface"
 
 export const formatter = morgan(morganFormat, {
     stream: {
@@ -50,21 +48,9 @@ export const formatter = morgan(morganFormat, {
                 responseTime: `${brightRed}${status[3]}ms${reset}`, // Response time in Bright Red
             }
 
-            // Log colored message to the console
             logger.info(
                 `${coloredMessage.method} ${coloredMessage.url} ${coloredMessage.status} ${coloredMessage.responseTime}`,
             )
-
-            // Save clean JSON log (without color codes) to file
-            const logObject: ILog = {
-                method: status[0], // Method without color
-                url: status[1], // URL without color
-                status: status[2], // Status without color
-                responseTime: `${status[3]}ms`, // Response time without color
-            }
-
-            // Log the clean JSON object to the file (no color)
-            logger.info(logObject)
         },
     },
 })

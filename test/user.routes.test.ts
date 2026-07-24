@@ -34,6 +34,21 @@ describe("POST /api/v1/users/register", () => {
         expect(res.body.data).not.toHaveProperty("password")
     })
 
+    it("should return id instead of _id and omit __v", async () => {
+        const res = await request(app)
+            .post("/api/v1/users/register")
+            .field("username", "idtest")
+            .field("fullName", "ID Test")
+            .field("email", "idtest@example.com")
+            .field("password", "StrongPass1")
+
+        expect(res.status).toBe(201)
+        expect(res.body.data).toHaveProperty("id")
+        expect(typeof res.body.data.id).toBe("string")
+        expect(res.body.data).not.toHaveProperty("_id")
+        expect(res.body.data).not.toHaveProperty("__v")
+    })
+
     it("should register a user without profile image", async () => {
         const res = await request(app)
             .post("/api/v1/users/register")
@@ -141,6 +156,8 @@ describe("POST /api/v1/users/login", () => {
         expect(res.body.data.user).not.toHaveProperty("password")
         expect(res.body.data.user).not.toHaveProperty("activationToken")
         expect(res.body.data.user).not.toHaveProperty("refreshToken")
+        expect(res.body.data.user).not.toHaveProperty("_id")
+        expect(res.body.data.user).not.toHaveProperty("__v")
     })
 
     it("should fail with wrong password", async () => {
@@ -406,6 +423,10 @@ describe("POST /api/v1/users/update-user-data", () => {
 
         expect(typeof res.status).toBe("number")
         expect(res.status).toBe(201)
+        expect(res.body.data).toHaveProperty("id")
+        expect(typeof res.body.data.id).toBe("string")
+        expect(res.body.data).not.toHaveProperty("_id")
+        expect(res.body.data).not.toHaveProperty("__v")
     })
 
     it("should fail without auth token", async () => {
