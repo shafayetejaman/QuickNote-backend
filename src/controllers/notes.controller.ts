@@ -94,14 +94,9 @@ export const createOrUpdateNote = asyncHandler(async (req, res) => {
     const newNote = generateNoteWithTitle(existing)
 
     newNote.user = new mongo.ObjectId(req.user!.id)
-    const { body, color, tags, category, remainders } = matchedData(req)
+    const { title, ...rest } = matchedData(req)
 
-    if (body) newNote.body = body
-    if (color) newNote.color = color
-    if (tags) newNote.tags = tags
-    if (category) newNote.category = category
-    if (remainders) newNote.remainders = remainders
-
+    newNote.set(rest)
     await newNote.save()
 
     return new ApiRespose(

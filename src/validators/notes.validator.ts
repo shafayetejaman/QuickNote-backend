@@ -1,4 +1,5 @@
 import { param } from "express-validator"
+import mongoose from "mongoose"
 import { commonBodyValidator } from "./commonValidator"
 
 export function createNoteValidator() {
@@ -12,8 +13,16 @@ export function createNoteValidator() {
 
         commonBodyValidator("color", true).isMongoId(),
 
-        commonBodyValidator("tags", true).isArray({ min: 1 }),
-
+        commonBodyValidator("tags", true)
+            .isArray({ min: 1 })
+            .custom((tags) => {
+                tags.forEach((tag: string) => {
+                    if (!mongoose.Types.ObjectId.isValid(tag)) {
+                        throw Error("invalid tags")
+                    }
+                })
+                return true
+            }),
         commonBodyValidator("category", true).isMongoId(),
 
         commonBodyValidator("remainders", true).isArray({ min: 1 }),
@@ -33,7 +42,16 @@ export function updateNoteValidator() {
 
         commonBodyValidator("color", true).isMongoId(),
 
-        commonBodyValidator("tags", true).isArray({ min: 1 }),
+        commonBodyValidator("tags", true)
+            .isArray({ min: 1 })
+            .custom((tags) => {
+                tags.forEach((tag: string) => {
+                    if (!mongoose.Types.ObjectId.isValid(tag)) {
+                        throw error("invalid tags")
+                    }
+                })
+                return true
+            }),
 
         commonBodyValidator("category", true).isMongoId(),
 

@@ -2,20 +2,13 @@
     "compilerOptions": {
         "target": "es2020",
         "module": "commonjs",
+        "moduleResolution": "bundler",
         "outDir": "./dist",
         "rootDir": "./src",
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "allowSyntheticDefaultImports": true,
-        "noImplicitAny": true,
-        "noImplicitThis": true,
-        "strictNullChecks": true,
-        "strictFunctionTypes": true,
-        "strictBindCallApply": true,
-        "strictPropertyInitialization": true,
-        "strictBuiltinIteratorReturn": true,
-        "alwaysStrict": true,
         "useUnknownInCatchVariables": true
     },
     "include": [

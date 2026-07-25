@@ -89,11 +89,11 @@ export const loginUser = asyncHandler(async (req, res) => {
 
 export const logoutUser = asyncHandler(async (req, res) => {
     const user =
-        (userCache.get(req.user?.id) as IUserDoc) ||
+        (userCache.get(req.user!.id) as IUserDoc) ||
         (await User.findById(req.user?.id))
     if (!user) throw new ApiError("Unable to find user", 500)
 
-    userCache.del(req.user?.id)
+    userCache.del(req.user!.id)
     user.refreshToken = undefined
 
     await user.save()
