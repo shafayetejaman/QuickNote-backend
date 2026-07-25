@@ -1,10 +1,9 @@
 import { Router } from "express"
 import {
-    createNote,
+    createOrUpdateNote,
     deleteNote,
     getAllNotes,
     getNote,
-    updateNote,
 } from "../controllers/notes.controller"
 import {
     createSubNote,
@@ -35,12 +34,12 @@ router.use(authMiddleware)
 router
     .route("/")
     .get(getAllNotes)
-    .post(authMiddleware, createNoteValidator(), validate, createNote)
+    .post(authMiddleware, createNoteValidator(), validate, createOrUpdateNote)
 
 router
     .route("/:noteId")
     .get(authMiddleware, getNoteValidator(), validate, getNote)
-    .patch(authMiddleware, updateNoteValidator(), validate, updateNote)
+    .patch(authMiddleware, updateNoteValidator(), validate, createOrUpdateNote)
     .delete(authMiddleware, deleteNoteValidator(), validate, deleteNote)
 
 router

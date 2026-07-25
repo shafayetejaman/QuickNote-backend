@@ -1,51 +1,14 @@
 import { matchedData } from "express-validator"
-import mongoose, { mongo } from "mongoose"
+import { mongo } from "mongoose"
 import { Note } from "../models/notes.model"
 import { SubNote } from "../models/subNotes.model"
 import ApiError from "../utils/apiError"
 import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
-import { generateNoteWithTitle } from "./notes.helper.controller"
-
-const commonNoteAggregation = () => {
-    return [
-        {
-            $lookup: {
-                from: "tags",
-                localField: "tags",
-                foreignField: "_id",
-                as: "tags",
-            },
-        },
-        {
-            $lookup: {
-                from: "colors",
-                localField: "color",
-                foreignField: "_id",
-                as: "color",
-                pipeline: [
-                    {
-                        $unset: ["_id", "colorName", "__v"],
-                    },
-                ],
-            },
-        },
-        {
-            $lookup: {
-                from: "categories",
-                localField: "category",
-                foreignField: "_id",
-                as: "category",
-            },
-        },
-        {
-            $addFields: {
-                color: { $first: "$color" },
-                category: { $first: "$category" },
-            },
-        },
-    ]
-}
+import {
+    commonNoteAggregation,
+    generateNoteWithTitle,
+} from "./notes.helper.controller"
 
 export const getAllNotes = asyncHandler(async (req, res) => {
     const notes = await Note.aggregate([
@@ -76,7 +39,8 @@ export const getNote = asyncHandler(async (req, res) => {
     const note = await Note.aggregate([
         {
             $match: {
-                _id: new mongo.ObjectId(req.query.id as string),
+                _id: new mongo.ObjectId(req.params.noteId as string),
+                user: new mongo.ObjectId(req.user!.id),
             },
         },
         ...commonNoteAggregation(),
@@ -105,7 +69,7 @@ export const getNote = asyncHandler(async (req, res) => {
                     },
                     {
                         $addFields: {
-                            color: { $first: "$color" },
+                            color: { $first: "$color.hex" },
                         },
                     },
                 ],
@@ -124,41 +88,27 @@ export const getNote = asyncHandler(async (req, res) => {
     return new ApiRespose("Note fetched successfully", 200, note).send(res)
 })
 
-export const createNote = asyncHandler(async (req, res) => {
-    const existing = await Note.findOne({ title: req.body.title })
+export const createOrUpdateNote = asyncHandler(async (req, res) => {
+    let existing = null
+    if (req.body.title) existing = await Note.findOne({ title: req.body.title })
     const newNote = generateNoteWithTitle(existing)
 
-    newNote.user = new mongoose.Types.ObjectId(req.user!.id)
-    newNote.body = req.body.body
+    newNote.user = new mongo.ObjectId(req.user!.id)
+    const { body, color, tags, category, remainders } = matchedData(req)
 
-    if (req.body.color) newNote.color = req.body.color
-    if (req.body.tags) newNote.tags = req.body.tags
-    if (req.body.category) newNote.category = req.body.category
-    if (req.body.remainders) newNote.remainders = req.body.remainders
+    if (body) newNote.body = body
+    if (color) newNote.color = color
+    if (tags) newNote.tags = tags
+    if (category) newNote.category = category
+    if (remainders) newNote.remainders = remainders
 
     await newNote.save()
 
-    return new ApiRespose("New note created succesfully", 201, newNote).send(
-        res,
-    )
-})
-
-export const updateNote = asyncHandler(async (req, res) => {
-    const data = matchedData(req)
-
-    if (data.title) {
-        const existing = await Note.findOne({ title: data.title })
-        if (existing) throw new ApiError("Title already exists", 409)
-    }
-
-    const note = await Note.findByIdAndUpdate(
-        { _id: req.params.noteId, user: req.user!.id },
-        { $set: data },
-        { new: true, runValidators: true },
-    )
-    if (!note) throw new ApiError("Note not found", 404)
-
-    return new ApiRespose("Note updated successfully", 200, note).send(res)
+    return new ApiRespose(
+        "New note created or updated succesfully",
+        201,
+        newNote,
+    ).send(res)
 })
 
 export const deleteNote = asyncHandler(async (req, res) => {

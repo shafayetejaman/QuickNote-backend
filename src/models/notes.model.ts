@@ -12,7 +12,6 @@ const noteSchema = new mongoose.Schema<INote>(
             type: String,
             required: true,
             maxlength: 50,
-            unique: true,
         },
         body: {
             type: String,

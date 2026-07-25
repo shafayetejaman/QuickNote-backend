@@ -20,3 +20,43 @@ export function generateNoteWithTitle(note: INoteDoc | null) {
 
     return newNote
 }
+
+export const commonNoteAggregation = () => {
+    return [
+        {
+            $lookup: {
+                from: "tags",
+                localField: "tags",
+                foreignField: "_id",
+                as: "tags",
+            },
+        },
+        {
+            $lookup: {
+                from: "colors",
+                localField: "color",
+                foreignField: "_id",
+                as: "color",
+                pipeline: [
+                    {
+                        $unset: ["_id", "colorName", "__v"],
+                    },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: "categories",
+                localField: "category",
+                foreignField: "_id",
+                as: "category",
+            },
+        },
+        {
+            $addFields: {
+                color: { $first: "$color.hex" },
+                category: { $first: "$category" },
+            },
+        },
+    ]
+}
