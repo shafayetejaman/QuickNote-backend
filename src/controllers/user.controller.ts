@@ -19,7 +19,7 @@ import {
 } from "./user.heper.controller"
 
 export const registerUser = asyncHandler(async (req, res) => {
-    const data = req.body
+    const data = matchedData(req)
 
     const profileImagePath = req.files?.profileImage?.[0]?.path || null
     const user = new User(data)

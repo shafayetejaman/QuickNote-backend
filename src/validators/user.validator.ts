@@ -1,21 +1,46 @@
 import invalidDomian from "disposable-email-domains"
-import { commonBodyValidator, commonQueryValidator } from "./commonValidator"
+import {
+    commonBodyValidator,
+    commonQueryValidator,
+    ValidatorType,
+} from "./commonValidator"
 
 export function registerUserQueryValidator() {
     return [
-        commonBodyValidator("username")
-            .isString()
+        commonBodyValidator(
+            "username",
+            false,
+            undefined,
+            ValidatorType.String,
+        )
             .isLength({ min: 2, max: 50 })
-            .withMessage("Invalid lenght")
-            .matches(/^([a-zA-Z._-]+\d*)+$/),
+            .withMessage("Invalid lenght"),
 
-        commonBodyValidator("email").isEmail({
-            host_blacklist: invalidDomian,
+        commonBodyValidator(
+            "email",
+            false,
+            undefined,
+            ValidatorType.Email,
+        ).custom((value) => {
+            if (invalidDomian.includes(value)) {
+                throw new Error("Disposable email addresses are not allowed")
+            }
+            return true
         }),
 
-        commonBodyValidator("fullName").isString(),
+        commonBodyValidator(
+            "fullName",
+            false,
+            undefined,
+            ValidatorType.String,
+        ),
 
-        commonBodyValidator("password")
+        commonBodyValidator(
+            "password",
+            false,
+            undefined,
+            ValidatorType.String,
+        )
             .isStrongPassword({
                 minLength: 8,
                 minLowercase: 1,
@@ -33,21 +58,49 @@ export function registerUserQueryValidator() {
 
 export function loginUserQueryValidator() {
     return [
-        commonBodyValidator("username").isString(),
+        commonBodyValidator(
+            "username",
+            false,
+            undefined,
+            ValidatorType.String,
+        ).isLength({ min: 3, max: 50 }),
 
-        commonBodyValidator("password").isString(),
+        commonBodyValidator(
+            "password",
+            false,
+            undefined,
+            ValidatorType.String,
+        ).isLength({ min: 8 }),
     ]
 }
 
 export function updateUserQueryValidator() {
     return [
-        commonBodyValidator("fullName", true).isString(),
+        commonBodyValidator(
+            "fullName",
+            true,
+            undefined,
+            ValidatorType.String,
+        ),
 
-        commonBodyValidator("email", true).isEmail({
-            host_blacklist: invalidDomian,
+        commonBodyValidator(
+            "email",
+            true,
+            undefined,
+            ValidatorType.Email,
+        ).custom((value) => {
+            if (invalidDomian.includes(value)) {
+                throw new Error("Disposable email addresses are not allowed")
+            }
+            return true
         }),
 
-        commonBodyValidator("password", true)
+        commonBodyValidator(
+            "password",
+            true,
+            undefined,
+            ValidatorType.String,
+        )
             .isStrongPassword({
                 minLength: 8,
                 minLowercase: 1,
@@ -61,23 +114,34 @@ export function updateUserQueryValidator() {
                     "and 1 number",
             ),
 
-        commonBodyValidator("confPassword", true)
-            .isString()
-            .custom((value, { req }) => {
-                if (value !== req.body.password) {
-                    throw new Error("Passwords do not match!")
-                }
-                return true
-            }),
+        commonBodyValidator(
+            "confPassword",
+            true,
+            undefined,
+            ValidatorType.String,
+        ).custom((value, { req }) => {
+            if (value !== req.body.password) {
+                throw new Error("Passwords do not match!")
+            }
+            return true
+        }),
     ]
 }
 
 export function activateUserQueryValidator() {
     return [
-        commonQueryValidator("userId")
-            .isMongoId()
-            .withMessage("Invalid user ID!"),
+        commonQueryValidator(
+            "userId",
+            false,
+            "Invalid user ID!",
+            ValidatorType.ObjectId,
+        ),
 
-        commonQueryValidator("token").isString().isLength({ min: 10 }),
+        commonQueryValidator(
+            "token",
+            false,
+            undefined,
+            ValidatorType.String,
+        ).isLength({ min: 10 }),
     ]
 }

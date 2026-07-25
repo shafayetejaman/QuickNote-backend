@@ -1,31 +1,57 @@
 import { param } from "express-validator"
 import mongoose from "mongoose"
-import { commonBodyValidator } from "./commonValidator"
+import { commonBodyValidator, ValidatorType } from "./commonValidator"
 
 export function createNoteValidator() {
     return [
-        commonBodyValidator("title")
-            .isString()
+        commonBodyValidator("title", false, undefined, ValidatorType.String)
             .isLength({ min: 2, max: 50 })
             .withMessage("Title must be between 2 and 50 characters"),
 
-        commonBodyValidator("body").isString(),
+        commonBodyValidator("body", false, undefined, ValidatorType.String),
 
-        commonBodyValidator("color", true).isMongoId(),
+        commonBodyValidator("color", true, undefined, ValidatorType.ObjectId),
 
-        commonBodyValidator("tags", true)
-            .isArray({ min: 1 })
-            .custom((tags) => {
-                tags.forEach((tag: string) => {
-                    if (!mongoose.Types.ObjectId.isValid(tag)) {
-                        throw Error("invalid tags")
-                    }
-                })
-                return true
-            }),
-        commonBodyValidator("category", true).isMongoId(),
+        commonBodyValidator(
+            "tags",
+            true,
+            undefined,
+            ValidatorType.Array,
+        ).custom((tags: string[]) => {
+            tags.forEach((tag) => {
+                if (
+                    typeof tag !== "string" ||
+                    tag.length === 0 ||
+                    !mongoose.Types.ObjectId.isValid(tag)
+                ) {
+                    throw new Error("Each tag must be a non-empty string")
+                }
+            })
+            return true
+        }),
 
-        commonBodyValidator("remainders", true).isArray({ min: 1 }),
+        commonBodyValidator(
+            "category",
+            true,
+            undefined,
+            ValidatorType.ObjectId,
+        ),
+
+        commonBodyValidator(
+            "remainders",
+            true,
+            undefined,
+            ValidatorType.Array,
+        ).custom((remainders: string[]) => {
+            remainders.forEach((r) => {
+                if (typeof r !== "string" || Number.isNaN(Date.parse(r))) {
+                    throw new Error(
+                        "Each remainder must be a valid ISO 8601 date",
+                    )
+                }
+            })
+            return true
+        }),
     ]
 }
 
@@ -33,29 +59,54 @@ export function updateNoteValidator() {
     return [
         param("noteId").isMongoId().withMessage("Invalid note ID!"),
 
-        commonBodyValidator("title", true)
-            .isString()
+        commonBodyValidator("title", true, undefined, ValidatorType.String)
             .isLength({ min: 2, max: 50 })
             .withMessage("Title must be between 2 and 50 characters"),
 
-        commonBodyValidator("body", true).isString(),
+        commonBodyValidator("body", true, undefined, ValidatorType.String),
 
-        commonBodyValidator("color", true).isMongoId(),
+        commonBodyValidator("color", true, undefined, ValidatorType.ObjectId),
 
-        commonBodyValidator("tags", true)
-            .isArray({ min: 1 })
-            .custom((tags) => {
-                tags.forEach((tag: string) => {
-                    if (!mongoose.Types.ObjectId.isValid(tag)) {
-                        throw error("invalid tags")
-                    }
-                })
-                return true
-            }),
+        commonBodyValidator(
+            "tags",
+            true,
+            undefined,
+            ValidatorType.Array,
+        ).custom((tags: string[]) => {
+            tags.forEach((tag) => {
+                if (
+                    typeof tag !== "string" ||
+                    tag.length === 0 ||
+                    !mongoose.Types.ObjectId.isValid(tag)
+                ) {
+                    throw new Error("Each tag must be a non-empty string")
+                }
+            })
+            return true
+        }),
 
-        commonBodyValidator("category", true).isMongoId(),
+        commonBodyValidator(
+            "category",
+            true,
+            undefined,
+            ValidatorType.ObjectId,
+        ),
 
-        commonBodyValidator("remainders", true).isArray({ min: 1 }),
+        commonBodyValidator(
+            "remainders",
+            true,
+            undefined,
+            ValidatorType.Array,
+        ).custom((remainders: string[]) => {
+            remainders.forEach((r) => {
+                if (typeof r !== "string" || Number.isNaN(Date.parse(r))) {
+                    throw new Error(
+                        "Each remainder must be a valid ISO 8601 date",
+                    )
+                }
+            })
+            return true
+        }),
     ]
 }
 
