@@ -115,5 +115,5 @@ export const deleteNote = asyncHandler(async (req, res) => {
 
     await SubNote.deleteMany({ _id: { $in: note.subNotes } })
 
-    return new ApiRespose("Note deleted successfully", 200, {}).send(res)
+    return new ApiRespose("Note deleted successfully", 200).send(res)
 })

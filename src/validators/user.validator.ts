@@ -7,12 +7,7 @@ import {
 
 export function registerUserQueryValidator() {
     return [
-        commonBodyValidator(
-            "username",
-            false,
-            undefined,
-            ValidatorType.String,
-        )
+        commonBodyValidator("username", false, undefined, ValidatorType.String)
             .isLength({ min: 2, max: 50 })
             .withMessage("Invalid lenght"),
 
@@ -28,19 +23,9 @@ export function registerUserQueryValidator() {
             return true
         }),
 
-        commonBodyValidator(
-            "fullName",
-            false,
-            undefined,
-            ValidatorType.String,
-        ),
+        commonBodyValidator("fullName", false, undefined, ValidatorType.String),
 
-        commonBodyValidator(
-            "password",
-            false,
-            undefined,
-            ValidatorType.String,
-        )
+        commonBodyValidator("password", false, undefined, ValidatorType.String)
             .isStrongPassword({
                 minLength: 8,
                 minLowercase: 1,
@@ -76,12 +61,7 @@ export function loginUserQueryValidator() {
 
 export function updateUserQueryValidator() {
     return [
-        commonBodyValidator(
-            "fullName",
-            true,
-            undefined,
-            ValidatorType.String,
-        ),
+        commonBodyValidator("fullName", true, undefined, ValidatorType.String),
 
         commonBodyValidator(
             "email",
@@ -95,12 +75,7 @@ export function updateUserQueryValidator() {
             return true
         }),
 
-        commonBodyValidator(
-            "password",
-            true,
-            undefined,
-            ValidatorType.String,
-        )
+        commonBodyValidator("password", true, undefined, ValidatorType.String)
             .isStrongPassword({
                 minLength: 8,
                 minLowercase: 1,

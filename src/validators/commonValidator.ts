@@ -48,11 +48,7 @@ export function commonBodyValidator(
     chain = applyTypeCheck(chain, type)
 
     if (type === ValidatorType.String) {
-        return chain
-            .trim()
-            .notEmpty()
-            .withMessage(`${name} is empty!`)
-            .escape()
+        return chain.trim().notEmpty().withMessage(`${name} is empty!`).escape()
     }
 
     return chain
@@ -74,11 +70,7 @@ export function commonQueryValidator(
     chain = applyTypeCheck(chain, type)
 
     if (type === ValidatorType.String) {
-        return chain
-            .trim()
-            .notEmpty()
-            .withMessage(`${name} is empty!`)
-            .escape()
+        return chain.trim().notEmpty().withMessage(`${name} is empty!`).escape()
     }
 
     return chain
