@@ -39,6 +39,9 @@ const userSchema = new mongoose.Schema<IUser>({
     profileImageUrl: {
         type: String,
     },
+    refreshToken: {
+        type: String,
+    },
     activationToken: {
         type: Object,
     },
@@ -53,11 +56,11 @@ userSchema.pre("save", async function () {
     )
 })
 
-userSchema.methods.isPasswordMatch = async function (password: string) {
+userSchema.methods.isPasswordMatch = async (password: string) => {
     return await bycript.compare(password, this.password)
 }
 
-userSchema.methods.extractData = function () {
+userSchema.methods.extractData = () => {
     const userData = this.toObject()
 
     // delete the fields that should not be returned
@@ -68,7 +71,7 @@ userSchema.methods.extractData = function () {
     return userData
 }
 
-userSchema.methods.generateAccessToken = async function () {
+userSchema.methods.generateAccessToken = async () => {
     return jwt.sign(
         {
             id: this._id,
@@ -84,7 +87,7 @@ userSchema.methods.generateAccessToken = async function () {
         },
     )
 }
-userSchema.methods.generateRefreshToken = async function () {
+userSchema.methods.generateRefreshToken = async () => {
     return jwt.sign(
         {
             id: this._id,
