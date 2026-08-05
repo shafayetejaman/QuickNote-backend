@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import { COOKIE_OPTIONS, COOKIE_OPTIONS_WITH_PATH } from "../constants"
+import { COOKIE_OPTIONS } from "../constants"
 import type IPayload from "../interfaces/playload.interface"
 import ApiError from "../utils/apiError"
 import ApiRespose from "../utils/apiResponse"
@@ -20,10 +20,8 @@ export default asyncHandler(async (req, res, next) => {
         ) as IPayload
     } catch (error) {
         console.error(error)
-        res.clearCookie("accessToken", COOKIE_OPTIONS).clearCookie(
-            "refreshToken",
-            COOKIE_OPTIONS_WITH_PATH,
-        )
+        res.clearCookie("accessToken", COOKIE_OPTIONS)
+
         return new ApiRespose("Access Token Invalid!", 401).send(res)
     }
     req.user = payload as IPayload

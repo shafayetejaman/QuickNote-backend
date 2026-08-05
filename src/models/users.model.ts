@@ -56,11 +56,11 @@ userSchema.pre("save", async function () {
     )
 })
 
-userSchema.methods.isPasswordMatch = async (password: string) => {
+userSchema.methods.isPasswordMatch = async function (password: string) {
     return await bycript.compare(password, this.password)
 }
 
-userSchema.methods.extractData = () => {
+userSchema.methods.extractData = function () {
     const userData = this.toObject()
 
     // delete the fields that should not be returned
@@ -71,7 +71,7 @@ userSchema.methods.extractData = () => {
     return userData
 }
 
-userSchema.methods.generateAccessToken = async () => {
+userSchema.methods.generateAccessToken = async function () {
     return jwt.sign(
         {
             id: this._id,
@@ -87,7 +87,7 @@ userSchema.methods.generateAccessToken = async () => {
         },
     )
 }
-userSchema.methods.generateRefreshToken = async () => {
+userSchema.methods.generateRefreshToken = async function () {
     return jwt.sign(
         {
             id: this._id,
