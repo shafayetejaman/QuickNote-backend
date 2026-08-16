@@ -5,30 +5,10 @@ import { SubNote } from "../models/subNotes.model"
 import ApiError from "../utils/apiError"
 import ApiRespose from "../utils/apiResponse"
 import asyncHandler from "../utils/asyncHandeler"
-import {
-    commonNoteAggregation,
-    generateNoteWithTitle,
-} from "./notes.helper.controller"
+import { generateNoteWithTitle } from "../utils/noteHelper"
 
 export const getAllNotes = asyncHandler(async (req, res) => {
-    const notes = await Note.aggregate([
-        {
-            $match: {
-                user: new mongo.ObjectId(req.user!.id),
-            },
-        },
-        ...commonNoteAggregation(),
-        {
-            $project: {
-                body: 0,
-                subNotes: 0,
-                createdAt: 0,
-                remainders: 0,
-                user: 0,
-                __v: 0,
-            },
-        },
-    ])
+    const notes = await Note.getAllNotes(req.user!.id)
 
     if (!notes) throw new ApiError("User not found")
 
@@ -36,52 +16,10 @@ export const getAllNotes = asyncHandler(async (req, res) => {
 })
 
 export const getNote = asyncHandler(async (req, res) => {
-    const note = await Note.aggregate([
-        {
-            $match: {
-                _id: new mongo.ObjectId(req.params.noteId as string),
-                user: new mongo.ObjectId(req.user!.id),
-            },
-        },
-        ...commonNoteAggregation(),
-        {
-            $lookup: {
-                from: "subnotes",
-                localField: "subNotes",
-                foreignField: "_id",
-                as: "subNotes",
-                pipeline: [
-                    {
-                        $unset: ["note"],
-                    },
-                    {
-                        $lookup: {
-                            from: "colors",
-                            localField: "color",
-                            foreignField: "_id",
-                            as: "color",
-                            pipeline: [
-                                {
-                                    $unset: ["_id", "colorName", "__v"],
-                                },
-                            ],
-                        },
-                    },
-                    {
-                        $addFields: {
-                            color: { $first: "$color.hex" },
-                        },
-                    },
-                ],
-            },
-        },
-        {
-            $project: {
-                user: 0,
-                __v: 0,
-            },
-        },
-    ])
+    const note = await Note.getNoteById(
+        req.params.noteId as string,
+        req.user!.id,
+    )
 
     if (!note) throw new ApiError("Note not found", 404)
 

@@ -16,7 +16,7 @@ import imagefileUploder from "../utils/cloudnary"
 import {
     sendEmailWithActivationToken,
     setAccessAndRefereshToken,
-} from "./user.heper.controller"
+} from "../utils/userHelper"
 
 export const registerUser = asyncHandler(async (req, res) => {
     const data = matchedData(req)
